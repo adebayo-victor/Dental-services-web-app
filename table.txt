@@ -1,0 +1,275 @@
+from cs50 import SQL
+from datetime import datetime
+
+# Connect to DB
+db = SQL("sqlite:///clinic.db")
+
+# -- TABLE CREATION --
+#web visits
+db.execute("""
+    CREATE TABLE visits (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient_id INTEGER NOT NULL,
+    ip_address TEXT NOT NULL,
+    path TEXT NOT NULL,
+    user_agent TEXT NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (patient_id) REFERENCES patients(id)
+);
+""")
+
+
+# Clinic Info
+db.execute("""
+CREATE TABLE IF NOT EXISTS clinic_info (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    clinic_name TEXT NOT NULL,
+    address TEXT NOT NULL,
+    phone_number TEXT NOT NULL,
+    email TEXT NOT NULL,
+    operating_hours TEXT,
+    tagline TEXT,
+    facebook_url TEXT,
+    instagram_url TEXT,
+    twitter_url TEXT,
+    maps_embed_url TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+# Services
+db.execute("""
+CREATE TABLE IF NOT EXISTS services (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    price REAL,
+    fa_icon_class TEXT,
+    is_active INTEGER DEFAULT 1,
+    display_order INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+# Patients
+db.execute("""
+CREATE TABLE IF NOT EXISTS patients (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    full_name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    phone TEXT,
+    password TEXT NOT NULL,
+    gender TEXT,
+    date_of_birth DATE,
+    address TEXT,
+    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+# Testimonials
+db.execute("""
+CREATE TABLE IF NOT EXISTS testimonials (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient_id INTEGER,
+    quote TEXT NOT NULL,
+    author_name TEXT NOT NULL,
+    author_description TEXT,
+    is_approved INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(patient_id) REFERENCES patients(id)
+)
+""")
+#OTP management table
+db.execute("""
+    CREATE TABLE IF NOT EXISTS otps (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        patient_id INTEGER UNIQUE NOT NULL,
+        otp TEXT NOT NULL,
+        expires_at DATETIME NOT NULL,
+        FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
+    )
+""")
+
+# ✅ Team Members with email & phone_number
+db.execute("""
+CREATE TABLE IF NOT EXISTS team_members (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    position TEXT NOT NULL,
+    specialization TEXT,
+    email TEXT,
+    phone_number TEXT,
+    password TEXT NOT NULL,
+    bio TEXT,
+    image_url TEXT,
+    is_active INTEGER DEFAULT 1,
+    display_order INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+# Blog Posts
+db.execute("""
+CREATE TABLE IF NOT EXISTS blog_posts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    content TEXT NOT NULL,
+    author_id INTEGER,
+    published_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    featured_image_url TEXT,
+    is_published INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+# Appointments
+db.execute("""
+CREATE TABLE IF NOT EXISTS appointments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient_id INTEGER NOT NULL,
+    booked_date DATE NOT NULL,
+    booked_time TIME NOT NULL,
+    expiry_date DATE NOT NULL,
+    bill INTEGER NOT NULL,
+    appointment_code TEXT UNIQUE NOT NULL,
+    notes TEXT,
+    status TEXT DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(patient_id) REFERENCES patients(id)
+)
+""")
+
+# Users
+db.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    role TEXT DEFAULT 'admin',
+    is_active INTEGER DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+# --- SAMPLE DATA INSERTION ---
+
+def insert_sample_data():
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    if not db.execute("SELECT COUNT(*) FROM clinic_info")[0]["COUNT(*)"]:
+        db.execute("""
+            INSERT INTO clinic_info (clinic_name, address, phone_number, email, operating_hours, tagline)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, "Zaclice Dental Care", "123 Dental Lane, Lagos", "08012345678",
+            "contact@zacdental.com", "Mon–Fri: 9AM–5PM", "Brightening Smiles Everyday")
+
+    if not db.execute("SELECT COUNT(*) FROM services")[0]["COUNT(*)"]:
+        db.execute("""
+            INSERT INTO services (name, description, price, fa_icon_class)
+            VALUES (?, ?, ?, ?)
+        """, "Tooth Extraction", "Safe and professional removal of teeth", 15000.00, "fas fa-tooth")
+
+    sample_password = "securepassword123"
+    if not db.execute("SELECT COUNT(*) FROM patients WHERE email = ?", "victor@example.com")[0]["COUNT(*)"]:
+        db.execute("""
+            INSERT INTO patients (full_name, email, phone, gender, date_of_birth, address, password)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, "Victor Light", "victor@example.com", "08098765432", "Male", "1999-09-09", "Lagos, Nigeria", sample_password)
+
+    patient_id = db.execute("SELECT id FROM patients WHERE email = ?", "victor@example.com")[0]["id"]
+
+    if not db.execute("SELECT COUNT(*) FROM testimonials")[0]["COUNT(*)"]:
+        db.execute("""
+            INSERT INTO testimonials (patient_id, quote, author_name, author_description, is_approved)
+            VALUES (?, ?, ?, ?, ?)
+        """, patient_id, "This clinic changed my life!", "Jane Doe", "Patient since 2021", 1)
+
+    if not db.execute("SELECT COUNT(*) FROM team_members")[0]["COUNT(*)"]:
+        db.execute("""
+            INSERT INTO team_members (name, position, specialization, email, phone_number, bio, image_url,password)
+            VALUES (?, ?, ?, ?, ?, ?, ?,?)
+        """, "Dr. Ada Obi", "Chief Dentist", "Cosmetic Dentistry", "ada@zacdental.com",
+            "08022223333", "Focused on transforming smiles.", "https://i.imgur.com/doctorada.jpg", 'password123')
+
+    if not db.execute("SELECT COUNT(*) FROM blog_posts")[0]["COUNT(*)"]:
+        db.execute("""
+            INSERT INTO blog_posts (title, slug, content)
+            VALUES (?, ?, ?)
+        """, "5 Tips for a Healthy Smile", "healthy-smile-tips", "Daily flossing and brushing make all the difference!")
+
+    if not db.execute("SELECT COUNT(*) FROM appointments")[0]["COUNT(*)"]:
+        db.execute("""
+            INSERT INTO appointments (patient_id, booked_date, booked_time, expiry_date, bill, appointment_code, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, patient_id, "2025-07-14", "14:30", "2025-07-14", 500, "APPT-VIC-0714", "Complaining of gum bleeding")
+
+    if not db.execute("SELECT COUNT(*) FROM users")[0]["COUNT(*)"]:
+        db.execute("""
+            INSERT INTO users (username, email, password_hash)
+            VALUES (?, ?, ?)
+        """, "admin", "admin@zacdental.com", "placeholder_admin_password_hash")
+
+    print("✅ All tables created & sample data loaded. The database is armed, dangerous, and fabulous.")
+
+# Call the insert function
+insert_sample_data()
+
+
+@app.route('/post_session', methods=['GET','POST'])
+def post_session():
+    if request.method == "POST":
+        #get patient id from a different table
+        #insert patient id along with 
+        try:
+            data = request.get_json()
+            name = data['name']
+            email = data['email']
+            phone_number = data['phone_number']
+            symptoms = data['symptoms']
+            services = data['services']
+            bill = data['bill']
+            print(name)
+            print(email)
+            print(phone_number)
+            print(symptoms)
+            print(bill)
+            print(services)
+            #expiry limit
+            limit = 0
+            with open('expiry_limit.csv', mode='r', encoding='utf-8') as file:
+                reader = csv.reader(file)
+                first_row = next(reader)  # get the first row
+                limit = first_row[0]
+                print('limit:', limit)
+
+
+            #construct note
+            note = f'''
+                Services: {services}
+                Symptoms: {symptoms}
+                Bill: {bill}
+            '''
+            print(note)
+            #get patient id
+            existing_patient = db.execute('SELECT * FROM patients WHERE email = ?', email)
+            if not existing_patient:
+                return {"response":"patient is not in database"}
+            #get expiry date 
+            expiry_date = (datetime.now() + timedelta(days = int(limit))).strftime('%Y:%m:%d:%H:%M')
+            expiry_time = (datetime.now() + timedelta(days = int(limit))).strftime('%H:%M')
+            #get booked time and date
+            booked_date = datetime.now().strftime('%Y-%m-%d')
+            booked_time = datetime.now().strftime('%H:%M')
+            db.execute('INSERT INTO appointments(patient_id, booked_date, booked_time, status, notes, expires_at, appointment_code, bill) VALUES(?,?,?,?,?,?,?,?)', existing_patient[0]['id'], booked_date, booked_time, 'valid', note, expiry_date, generate_code(), bill)
+            print(db.execute('SELECT * FROM appointments'))
+            return {"response":"post request successful"}
+        except Exception as e:
+            return {'response':f"Trouble brewing as {e}"}

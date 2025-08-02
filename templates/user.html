@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - Gateway Dental Care</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Custom Colors from your dental website */
+        :root {
+            --primary-blue: #0F1E5E; /* Deep Blue */
+            --secondary-blue: #1A2B6A; /* Slightly lighter blue for cards/elements */
+            --accent-red: #E00000;   /* Vibrant Red */
+            --text-light: #F0F0F0;   /* Light Off-White Text */
+            --bg-dark-primary: #0B1641; /* Very dark background */
+            --border-glow: rgba(224, 0, 0, 0.4); /* Red glow for focus/hover */
+            --input-bg: rgba(15, 30, 94, 0.6); /* Semi-transparent blue for inputs */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif; /* Using Inter as a modern sans-serif font */
+            background-color: var(--bg-dark-primary);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Custom scrollbar for a sleek look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--primary-blue);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-red);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #C00000;
+        }
+
+        .appointment-card {
+            background-color: var(--secondary-blue);
+            border-radius: 0.75rem; /* rounded-lg */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(224, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .appointment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            border-color: var(--border-glow);
+        }
+
+        .status-pending {
+            color: orange;
+            background-color: rgba(255, 165, 0, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+        }
+        .status-confirmed {
+            color: limegreen;
+            background-color: rgba(50, 205, 50, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+        }
+        .status-completed {
+            color: #60A5FA; /* blue-400 */
+            background-color: rgba(96, 165, 250, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+        }
+        .status-cancelled {
+            color: red;
+            background-color: rgba(255, 0, 0, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+        }
+
+        /* Overlay Styles */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+            backdrop-filter: blur(8px); /* Blur the content behind the overlay */
+            -webkit-backdrop-filter: blur(8px); /* Safari support */
+            z-index: 1000; /* Ensure it's on top of everything */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .overlay-content {
+            background-color: var(--secondary-blue); /* Dark blue background */
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            max-width: 500px; /* Smaller for forms */
+            width: 90%;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            color: var(--text-light); /* Ensure text is visible inside the content box */
+            max-height: 90vh; /* Limit height for scrollability */
+            overflow-y: auto; /* Enable scrolling for content */
+        }
+
+        .overlay.visible .overlay-content {
+            transform: translateY(0);
+        }
+
+        .close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--accent-red);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-button:hover {
+            color: #C00000;
+        }
+    </style>
+</head>
+<body class="bg-bg-dark-primary text-text-light">
+    <header class="bg-primary-blue py-6 shadow-md">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-white">My Dashboard</h1>
+            <nav>
+                <a href="/" class="text-white hover:text-accent-red transition-colors duration-300 mr-4">
+                    <i class="fas fa-home mr-2"></i>Home
+                </a>
+                <a href="/logout" class="text-white hover:text-accent-red transition-colors duration-300">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-12">
+        <section class="mb-8 text-center">
+            <h2 class="text-4xl font-extrabold text-white mb-4">Welcome, <span id="userNameDisplay" class="text-accent-red">{{ user.full_name }}</span>!</h2>
+            <p class="text-gray-300 text-lg">Here's a quick overview of your appointments and profile.</p>
+            <button id="editProfileBtn" class="mt-6 bg-accent-red text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-[#C00000] transition-transform transform hover:scale-105 duration-300">
+                <i class="fas fa-user-edit mr-2"></i>Edit Profile
+            </button>
+        </section>
+
+        <!-- Dashboard Summary Section -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="bg-secondary-blue p-6 rounded-lg shadow-xl border border-primary-blue text-center">
+                <i class="fas fa-check-circle text-5xl text-green-500 mb-4"></i>
+                <h3 class="text-2xl font-semibold text-white mb-2">Valid Appointments</h3>
+                <p class="text-5xl font-bold text-accent-red">{{ valid_count }}</p>
+            </div>
+            <div class="bg-secondary-blue p-6 rounded-lg shadow-xl border border-primary-blue text-center">
+                <i class="fas fa-history text-5xl text-blue-400 mb-4"></i>
+                <h3 class="text-2xl font-semibold text-white mb-2">Completed Appointments</h3>
+                <p class="text-5xl font-bold text-accent-red">{{ used_count }}</p>
+            </div>
+            <div class="bg-secondary-blue p-6 rounded-lg shadow-xl border border-primary-blue text-center">
+                <i class="fas fa-calendar-times text-5xl text-red-500 mb-4"></i>
+                <h3 class="text-2xl font-semibold text-white mb-2">Expired Appointments</h3>
+                <p class="text-5xl font-bold text-accent-red">{{ expired_count }}</p>
+            </div>
+        </section>
+
+        <!-- Appointments List Section -->
+        <section id="appointments-list">
+            <h2 class="text-3xl font-bold text-white mb-6 text-center">Your Appointments</h2>
+            {% if appointments %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for appointment in appointments %}
+                <div class="appointment-card p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-white">Appointment on {{ appointment.booked_date }}</h3>
+                        <span class="text-sm font-medium
+                            {% if appointment.status == 'pending' %} status-pending
+                            {% elif appointment.status == 'confirmed' %} status-confirmed
+                            {% elif appointment.status == 'completed' %} status-completed
+                            {% elif appointment.status == 'cancelled' %} status-cancelled
+                            {% else %} text-gray-400
+                            {% endif %}">
+                            {{ appointment.status | capitalize }}
+                        </span>
+                    </div>
+                    <p class="text-gray-300 mb-2"><strong class="text-accent-red">Time:</strong> {{ appointment.booked_time }}</p>
+                    <p class="text-gray-300 mb-2"><strong class="text-accent-red">Code:</strong> {{ appointment.appointment_code }}</p>
+                    <p class="text-gray-300 mb-4"><strong class="text-accent-red">Notes:</strong> {{ appointment.notes if appointment.notes else 'N/A' }}</p>
+                    <p class="text-gray-300 mb-4"><strong class="text-accent-red">Bill:</strong> ₦{{ "%.2f" | format(appointment.bill) }}</p>
+                    <p class="text-gray-300 mb-4"><strong class="text-accent-red">Expires:</strong> {{ appointment.expires_at if appointment.expires_at else 'N/A' }}</p>
+                    <div class="flex justify-end space-x-4">
+                        <!-- Example buttons - you'd add JS for actual actions -->
+                        {% if appointment.status == 'pending' %}
+                        <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full text-sm transition-colors duration-200">
+                            <i class="fas fa-check-circle mr-1"></i> Confirm
+                        </button>
+                        <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm transition-colors duration-200">
+                            <i class="fas fa-times-circle mr-1"></i> Cancel
+                        </button>
+                        {% endif %}
+                        <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-full text-sm transition-colors duration-200">
+                            <i class="fas fa-info-circle mr-1"></i> Details
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12 bg-secondary-blue rounded-lg shadow-xl border border-primary-blue">
+                <i class="fas fa-calendar-times text-6xl text-gray-500 mb-6"></i>
+                <p class="text-2xl text-gray-400 font-semibold mb-4">No Appointments Found</p>
+                <p class="text-gray-500 text-lg">It looks like you don't have any appointments scheduled yet.</p>
+                <a href="/" class="inline-block mt-6 bg-accent-red text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-[#C00000] transition-transform transform hover:scale-105 duration-300">
+                    Book Your First Appointment
+                </a>
+            </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer class="bg-primary-blue py-6 text-center text-gray-400">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2025 Gateway Dental Care. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Update Patient Overlay -->
+    <div id="updatePatientOverlay" class="overlay">
+        <div class="overlay-content">
+            <button id="closeUpdatePatientOverlayBtn" class="close-button">&times;</button>
+            <h2 class="text-3xl font-bold text-white mb-8 text-center">Update Your Profile</h2>
+            <form id="updatePatientForm" class="space-y-6">
+                <div>
+                    <label for="update_name" class="block text-gray-300 text-sm font-bold mb-2">Full Name</label>
+                    <input type="text" id="update_name" name="full_name"
+                           class="shadow appearance-none border border-primary-blue rounded w-full py-3 px-4 text-black leading-tight focus:outline-none focus:ring-2 focus:ring-accent-red bg-input-bg"
+                           required>
+                </div>
+                <div>
+                    <label for="update_email" class="block text-gray-300 text-sm font-bold mb-2">Email</label>
+                    <input type="email" id="update_email" name="email"
+                           class="shadow appearance-none border border-primary-blue rounded w-full py-3 px-4 text-black leading-tight focus:outline-none focus:ring-2 focus:ring-accent-red bg-input-bg"
+                           required>
+                </div>
+                <div>
+                    <label for="update_phone" class="block text-gray-300 text-sm font-bold mb-2">Phone Number</label>
+                    <input type="tel" id="update_phone" name="phone"
+                           class="shadow appearance-none border border-primary-blue rounded w-full py-3 px-4 text-black leading-tight focus:outline-none focus:ring-2 focus:ring-accent-red bg-input-bg"
+                           required>
+                </div>
+                <div>
+                    <label for="update_password" class="block text-gray-300 text-sm font-bold mb-2">New Password (optional)</label>
+                    <input type="password" id="update_password" name="password"
+                           class="shadow appearance-none border border-primary-blue rounded w-full py-3 px-4 text-black leading-tight focus:outline-none focus:ring-2 focus:ring-accent-red bg-input-bg"
+                           placeholder="Leave blank to keep current password">
+                </div>
+                <button type="submit" class="w-full bg-accent-red text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-[#C00000] transition-colors duration-300 transform hover:scale-105">
+                    Save Changes
+                </button>
+                <p id="updateMessage" class="text-center mt-4 text-green-400"></p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const editProfileBtn = document.getElementById('editProfileBtn');
+            const updatePatientOverlay = document.getElementById('updatePatientOverlay');
+            const closeUpdatePatientOverlayBtn = document.getElementById('closeUpdatePatientOverlayBtn');
+            const updatePatientForm = document.getElementById('updatePatientForm');
+            const updateNameInput = document.getElementById('update_name');
+            const updateEmailInput = document.getElementById('update_email');
+            const updatePhoneInput = document.getElementById('update_phone');
+            const updatePasswordInput = document.getElementById('update_password'); // New password input
+            const updateMessage = document.getElementById('updateMessage');
+
+            // Backend URL - IMPORTANT: Replace with your actual backend URL
+            // If running locally, it might be 'http://127.0.0.1:8000' or similar.
+            // If deployed, use the deployed URL.
+            const BACKEND_URL = 'https://hhxsq4xb-8000.uks1.devtunnels.ms'; // Replace with your actual backend URL
+
+            // Function to show an overlay
+            function showOverlay(overlayElement) {
+                overlayElement.classList.add('visible');
+            }
+
+            // Function to hide an overlay
+            function hideOverlay(overlayElement) {
+                overlayElement.classList.remove('visible');
+            }
+
+            // Populate update form with current user data
+            function populateUpdateForm() {
+                // Jinja variables are directly accessible in the template's script
+                updateNameInput.value = "{{ user.full_name | default('') }}";
+                updateEmailInput.value = "{{ user.email | default('') }}";
+                updatePhoneInput.value = "{{ user.phone | default('') }}";
+                updatePasswordInput.value = ""; // Always clear password field for security
+            }
+
+            // Event listener for Edit Profile button
+            if (editProfileBtn) {
+                editProfileBtn.addEventListener('click', () => {
+                    populateUpdateForm();
+                    updateMessage.textContent = ''; // Clear previous messages
+                    showOverlay(updatePatientOverlay);
+                });
+            }
+
+            // Event listener for closing the update patient overlay
+            if (closeUpdatePatientOverlayBtn) {
+                closeUpdatePatientOverlayBtn.addEventListener('click', () => {
+                    hideOverlay(updatePatientOverlay);
+                });
+            }
+
+            // Handle Update Patient Form Submission
+            if (updatePatientForm) {
+                updatePatientForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    const userId = "{{ user.id }}"; // Get user ID from Jinja
+                    const updatedData = {
+                        id: userId,
+                        full_name: updateNameInput.value,
+                        email: updateEmailInput.value,
+                        phone: updatePhoneInput.value,
+                        password:updatePasswordInput.value
+                    };
+
+                    // Only add password to payload if it's not empty
+                    if (updatePasswordInput.value) {
+                        updatedData.password = updatePasswordInput.value;
+                    }
+
+                    updateMessage.textContent = 'Saving changes...';
+                    updateMessage.style.color = 'gray';
+
+                    try {
+                        const response = await fetch(`${BACKEND_URL}/update_patient`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(updatedData),
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok && data && data.length > 0 && data[0].response === 'Patient updated successfully') {
+                            updateMessage.textContent = 'Profile updated successfully!';
+                            updateMessage.style.color = 'green';
+                            // Update the displayed user name on the dashboard
+                            if (userNameDisplay) {
+                                userNameDisplay.textContent = updatedData.full_name;
+                            }
+                            // Optionally, update sessionStorage if you're using it for user data
+                            let currentUserData = JSON.parse(sessionStorage.getItem('loggedInUser'));
+                            if (currentUserData) {
+                                currentUserData.full_name = updatedData.full_name;
+                                currentUserData.email = updatedData.email;
+                                currentUserData.phone = updatedData.phone;
+                                // Do NOT update password in sessionStorage for security reasons
+                                sessionStorage.setItem('loggedInUser', JSON.stringify(currentUserData));
+                            }
+
+                            setTimeout(() => {
+                                hideOverlay(updatePatientOverlay);
+                            }, 1500);
+                        } else {
+                            updateMessage.textContent = data.message || 'Failed to update profile.';
+                            updateMessage.style.color = 'red';
+                        }
+                    } catch (error) {
+                        console.error('Update patient error:', error);
+                        updateMessage.textContent = 'An error occurred. Please try again.';
+                        updateMessage.style.color = 'red';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

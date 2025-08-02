@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dental Admin Dashboard - Modern Tech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{url_for('static', filename='assets/css/fontawesome-all.min.css')}}" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Colors from your dental website */
+        :root {
+            --primary-blue: #0F1E5E; /* Deep Blue */
+            --secondary-blue: #1A2B6A; /* Slightly lighter blue for cards/elements */
+            --accent-red: #E00000;   /* Vibrant Red */
+            --text-light: #F0F0F0;   /* Light Off-White Text */
+            --bg-dark-primary: #0B1641; /* Very dark background */
+            --border-glow: rgba(224, 0, 0, 0.4); /* Red glow for focus/hover */
+            --input-bg: rgba(15, 30, 94, 0.6); /* Semi-transparent blue for inputs */
+        }
+
+        body {
+            font-family: 'Chakra Petch', sans-serif; /* Modern, slightly techy font */
+            background-color: var(--bg-dark-primary);
+            color: var(--text-light);
+        }
+
+        /* Applying custom colors to Tailwind */
+        .bg-primary-blue { background-color: var(--primary-blue); }
+        .bg-secondary-blue { background-color: var(--secondary-blue); }
+        .text-accent-red { color: var(--accent-red); }
+        .hover\:bg-accent-red:hover { background-color: var(--accent-red); }
+        .border-accent-red { border-color: var(--accent-red); }
+        .focus\:border-accent-red:focus { border-color: var(--accent-red); }
+        .focus\:ring-accent-red:focus { --tw-ring-color: var(--accent-red); }
+
+        /* Specific styles for the tech look */
+        .card-glass {
+            background-color: rgba(26, 43, 106, 0.4); /* Semi-transparent secondary blue */
+            backdrop-filter: blur(5px); /* Subtle blur effect */
+            border: 1px solid rgba(224, 0, 0, 0.1); /* Very subtle red border */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 15px var(--border-glow); /* Enhanced shadow with glow */
+            transition: all 0.3s ease-in-out;
+        }
+        .card-glass:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 1px 5px rgba(0, 0, 0, 0.15), 0 0 25px var(--border-glow);
+        }
+
+        .input-tech {
+            background-color: var(--input-bg);
+            border: 1px solid var(--primary-blue);
+            color: var(--text-light);
+            transition: all 0.2s ease-in-out;
+        }
+        .input-tech:focus {
+            outline: none;
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 2px var(--accent-red), 0 0 10px var(--border-glow);
+        }
+        .input-tech::placeholder {
+            color: rgba(240, 240, 240, 0.6);
+        }
+
+        .btn-primary-tech {
+            background-color: var(--accent-red);
+            transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer; /* Add cursor pointer for span buttons */
+        }
+        .btn-primary-tech:hover {
+            background-color: #C00000; /* Darker red on hover */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3), 0 0 25px var(--border-glow);
+        }
+        .btn-secondary-tech {
+            background-color: var(--primary-blue);
+            color: var(--text-light);
+            transition: background-color 0.2s ease-in-out;
+            cursor: pointer; /* Add cursor pointer for span buttons */
+        }
+        .btn-secondary-tech:hover {
+            background-color: var(--secondary-blue);
+        }
+
+        /* Active Navigation Link Styling */
+        .nav-link.active {
+            background-color: var(--accent-red); /* Solid red background for active */
+            color: white;
+            font-weight: 600;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.4), 0 0 15px var(--border-glow);
+        }
+        .nav-link.active i {
+            color: white !important; /* Ensure icon is white too */
+        }
+        .nav-link:hover {
+            background-color: rgba(224, 0, 0, 0.4); /* Lighter red hover for non-active */
+            color: var(--text-light);
+        }
+
+        /* Custom styles for sidebar & overlay for mobile responsiveness */
+        .sidebar {
+            transform: translateX(0);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary-blue) 0%, #080d2b 100%); /* Subtle gradient */
+            border-right: 1px solid rgba(224, 0, 0, 0.1);
+            box-shadow: 5px 0 15px rgba(0,0,0,0.3);
+            display: flex; /* Use flex to manage inner content */
+            flex-direction: column; /* Stack content vertically */
+        }
+        /* Added for scrollability within the sidebar's navigation */
+        .sidebar nav {
+            flex-grow: 1; /* Allow nav to take available space */
+            overflow-y: auto; /* Add scrollbar if content overflows vertically */
+            padding-right: 8px; /* Add some padding for the scrollbar */
+        }
+
+
+        @media (max-width: 767px) {
+            .sidebar {
+                position: fixed;
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 20;
+            display: none;
+        }
+        .overlay.active {
+            display: block;
+        }
+
+        /* Ensure header search input and buttons stack on very small screens */
+        @media (max-width: 480px) {
+            header.flex-col {
+                align-items: flex-start;
+            }
+            header .relative {
+                margin-right: 0;
+            }
+            header .flex-1 {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Scrollbar styling for a techier look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px; /* For horizontal scrollbars */
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--primary-blue);
+            border-radius: 4px;
+            border: 2px solid var(--bg-dark-primary);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--accent-red);
+        }
+        .overlay-container {
+            position: fixed; /* Covers the entire viewport */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+            z-index: 999; /* Ensures it's on top */
+
+            /* Blur effect for the background content */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px); /* Safari compatibility */
+
+            /* Initial hidden state with smooth transition */
+            opacity: 0; /* Starts fully transparent */
+            pointer-events: none; /* Prevents interaction when hidden */
+            display: flex; /* Always flex to center content, but hidden by opacity/pointer-events */
+            align-items: center; /* Centers vertically */
+            justify-content: center; /* Centers horizontally */
+            transition: opacity 0.3s ease-in-out; /* Smooth fade-in/out */
+        }
+
+        /* The 'visible' class: when added, makes the overlay fully opaque and interactive */
+        .overlay-container.visible {
+            opacity: 1; /* Fully visible */
+            pointer-events: auto; /* Allows interaction */
+        }
+
+        /* Optional: Styles for the content *inside* your overlay (e.g., a modal box) */
+        .overlay-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: scale(0.9); /* Start slightly smaller for subtle pop-in */
+            transition: transform 0.3s ease-out; /* Smooth transform transition */
+        }
+
+        .overlay-container.visible .overlay-content {
+            transform: scale(1); /* Scale to normal size when visible */
+        }
+        .service_overlay{
+            background-color: #080d2b;
+        }
+        .view-appointment-overlay, .manage-testimonials-overlay, .all-patients-overlay, .view-patient-details-overlay, .update-patient-overlay, .all-visits-overlay, .view-visit-details-overlay, .admin-auth-overlay, .forgot-password-overlay {
+            /* Reusing existing overlay styles */
+            opacity: 0;
+            visibility: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+            backdrop-filter: blur(8px); /* Blur the content behind the overlay */
+            -webkit-backdrop-filter: blur(8px); /* Safari support */
+            z-index: 1000; /* Ensure it's on top of everything */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .view-appointment-overlay.visible, .manage-testimonials-overlay.visible, .all-patients-overlay.visible, .view-patient-details-overlay.visible, .update-patient-overlay.visible, .all-visits-overlay.visible, .view-visit-details-overlay.visible, .admin-auth-overlay.visible, .forgot-password-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Styles for testimonial summary boxes in admin panel */
+        .testimonial-admin-summary-box {
+            background-color: rgba(15, 30, 94, 0.6); /* input-bg for consistency */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: 1px solid var(--primary-blue);
+        }
+        .testimonial-admin-summary-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-red);
+        }
+        .testimonial-admin-summary-box .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Style for the full testimonial display within the admin overlay */
+        .full-testimonial-display-admin {
+            background-color: var(--secondary-blue); /* Slightly lighter blue for content */
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            max-width: 600px; /* Adjust max-width as needed */
+            width: 90%;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            color: var(--text-light);
+            max-height: 90vh;
+            overflow-y: auto;
+            text-align: center;
+            display: flex; /* Use flex for centering content */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 1010; /* Higher z-index to appear on top of summary grid */
+        }
+        .full-testimonial-display-admin.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* CSS for the new team member update overlay */
+        .update-member-overlay, .edit-service-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .update-member-overlay:target, .edit-service-overlay:target {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .update-member-content, .edit-service-content, .all-patients-content, .view-patient-details-content, .update-patient-content, .all-visits-content, .view-visit-details-content, .admin-auth-content, .forgot-password-content {
+            background-color: var(--secondary-blue);
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            color: var(--text-light);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .admin-auth-content, .forgot-password-content {
+            max-width: 450px; /* Smaller for auth forms */
+        }
+
+        .close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .close-button:hover {
+            color: var(--accent-red);
+        }
+
+        /* Scrollable content areas */
+        .scrollable-content-appointments, .scrollable-content-patients, .scrollable-content-bills, .scrollable-content-visits {
+            max-height: 400px; /* Adjust as needed */
+            overflow-y: auto;
+            border: 1px solid var(--primary-blue); /* Optional: add a border to indicate scrollability */
+            border-radius: 0.5rem;
+        }
+
+        .scrollable-content-testimonials {
+            max-height: 300px; /* Adjust as needed */
+            overflow-y: auto;
+            border: 1px solid var(--primary-blue); /* Optional: add a border to indicate scrollability */
+            border-radius: 0.5rem;
+            padding: 1rem; /* Add padding for better appearance */
+        }
+        /* Style for the testimonial summary grid within the overlay */
+        #testimonialAdminSummaryGrid {
+            max-height: 60vh; /* Set a max height for the grid itself */
+            overflow-y: auto; /* Make the grid scrollable */
+            padding-right: 10px; /* Add some padding for the scrollbar */
+        }
+
+        /* Toast Notification Styles */
+        #toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1001; /* Above overlays */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        #toast-notification.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Custom scrollbar for the new bills section */
+        .custom-scrollbar::-webkit-scrollbar, .scrollable-content-bills::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track, .scrollable-content-bills::-webkit-scrollbar-track {
+            background: var(--bg-dark-primary);
+        }
+        ::-webkit-scrollbar-thumb, .scrollable-content-bills::-webkit-scrollbar-thumb {
+            background-color: var(--primary-blue);
+            border-radius: 4px;
+            border: 2px solid var(--bg-dark-primary);
+        }
+        ::-webkit-scrollbar-thumb:hover, .scrollable-content-bills::-webkit-scrollbar-thumb:hover {
+            background-color: var(--accent-red);
+        }
+        /* Styles for the main content to be hidden initially */
+        body.auth-required > *:not(.admin-auth-overlay):not(.forgot-password-overlay) {
+            display: none;
+        }
+        body.auth-required {
+            overflow: hidden; /* Prevent scrolling of background content */
+        }
+        /* Custom file input styling */
+        .custom-file-upload {
+            border: 1px solid var(--primary-blue);
+            display: inline-block;
+            padding: 8px 12px;
+            cursor: pointer;
+            background-color: var(--input-bg);
+            color: var(--text-light);
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+        .custom-file-upload:hover {
+            background-color: var(--secondary-blue);
+            border-color: var(--accent-red);
+        }
+        .custom-file-upload input[type="file"] {
+            display: none;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2gFLKPXNq4rVz/hzWj6ws+M4Vc/o9Zk8T+SVDu5zK32M4T2F+K3001vJkQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body class="flex flex-col md:flex-row min-h-screen auth-required">
+    <!-- Toast Notification -->
+    <div id="toast-notification"></div>
+
+    <div id="sidebar-overlay" class="overlay"></div>
+
+    <!-- Admin Login Overlay -->
+    <div id="adminLoginOverlay" class="admin-auth-overlay visible">
+        <div class="admin-auth-content">
+            <h2 class="text-3xl font-bold text-white mb-8 text-center">Admin Login</h2>
+            <form id="adminLoginForm" class="space-y-6">
+                <div>
+                    <label for="admin_password" class="block text-gray-300 text-sm font-bold mb-2">Password</label>
+                    <input type="password" id="admin_password" name="password" class="input-tech shadow appearance-none border rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-bg-dark-primary" placeholder="********" required>
+                </div>
+                <button type="submit" class="w-full bg-accent-red text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-[#C00000] transition-colors duration-300 transform hover:scale-105">
+                    Login
+                </button>
+            </form>
+            <p id="adminLoginMessage" class="text-center mt-4 text-red-400"></p>
+            <p class="text-center text-gray-400 mt-6">
+                <a href="#" id="forgotPasswordLink" class="text-accent-red hover:underline">Forgot Password?</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- NEW: Forgot Password Overlay -->
+    <div id="forgotPasswordOverlay" class="forgot-password-overlay">
+        <div class="forgot-password-content card-glass p-8 rounded-xl relative">
+            <span id="closeForgotPasswordOverlay" class="close-button cursor-pointer">&times;</span>
+            <h2 class="text-3xl font-bold text-white mb-6 text-center">Forgot Password</h2>
+            <form id="forgotPasswordForm" class="space-y-6">
+                <div>
+                    <label for="forgot_password_email" class="block text-gray-300 text-sm font-bold mb-2">Admin Email</label>
+                    <input type="email" id="forgot_password_email" name="email" class="input-tech shadow appearance-none border rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-bg-dark-primary" placeholder="Enter your email" required>
+                </div>
+                <button type="submit" class="w-full bg-accent-red text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-[#C00000] transition-colors duration-300 transform hover:scale-105">
+                    Send Reset Link
+                </button>
+            </form>
+            <p id="forgotPasswordMessage" class="text-center mt-4 text-green-400"></p>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar md:w-64 w-full flex-shrink-0 z-40">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-white text-center font-['Orbitron']">Admin Dashboard</h1>
+        </div>
+        <nav class="mt-8 flex-1 overflow-y-auto">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#dashboard" class="nav-link flex items-center p-4 rounded-lg mx-3 transition-colors duration-200 hover:bg-opacity-40">
+                        <i class="fas fa-chart-line text-xl mr-4 text-gray-400"></i>
+                        <span class="font-semibold text-lg">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#appointments" class="nav-link flex items-center p-4 rounded-lg mx-3 transition-colors duration-200 hover:bg-opacity-40">
+                        <i class="fas fa-calendar-alt text-xl mr-4 text-gray-400"></i>
+                        <span class="font-semibold text-lg">Appointments</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#patients" class="nav-link flex items-center p-4 rounded-lg mx-3 transition-colors duration-200 hover:bg-opacity-40">
+                        <i class="fas fa-users text-xl mr-4 text-gray-400"></i>
+                        <span class="font-semibold text-lg">Patients</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#visits" class="nav-link flex items-center p-4 rounded-lg mx-3 transition-colors duration-200 hover:bg-opacity-40">
+                        <i class="fas fa-clinic-medical text-xl mr-4 text-gray-400"></i>
+                        <span class="font-semibold text-lg">Patient Visits</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#bills" class="nav-link flex items-center p-4 rounded-lg mx-3 transition-colors duration-200 hover:bg-opacity-40">
+                        <i class="fas fa-file-invoice-dollar text-xl mr-4 text-gray-400"></i>
+                        <span class="font-semibold text-lg">Bills & Payments</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#team" class="nav-link flex items-center p-4 rounded-lg mx-3 transition-colors duration-200 hover:bg-opacity-40">
+                        <i class="fas fa-user-tie text-xl mr-4 text-gray-400"></i>
+                        <span class="font-semibold text-lg">Team Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#services" class="nav-link flex items-center p-4 rounded-lg mx-3 transition-colors duration-200 hover:bg-opacity-40">
+                        <i class="fas fa-tooth text-xl mr-4 text-gray-400"></i>
+                        <span class="font-semibold text-lg">Services Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#testimonials" class="nav-link flex items-center p-4 rounded-lg mx-3 transition-colors duration-200 hover:bg-opacity-40">
+                        <i class="fas fa-star text-xl mr-4 text-gray-400"></i>
+                        <span class="font-semibold text-lg">Testimonials</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#blog" class="nav-link flex items-center p-4 rounded-lg mx-3 transition-colors duration-200 hover:bg-opacity-40">
+                        <i class="fas fa-blog text-xl mr-4 text-gray-400"></i>
+                        <span class="font-semibold text-lg">Blog Management</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="p-6">
+            <button id="logoutButton" class="w-full text-left flex items-center p-4 rounded-lg mx-3 transition-colors duration-200 hover:bg-red-600 bg-red-800">
+                <i class="fas fa-sign-out-alt text-xl mr-4 text-white"></i>
+                <span class="font-semibold text-lg text-white">Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col transition-all duration-300">
+        <header class="bg-primary-blue shadow-lg px-6 py-4 flex flex-col md:flex-row items-center justify-between z-20 sticky top-0">
+            <div class="flex items-center mb-4 md:mb-0 w-full md:w-auto">
+                <button id="sidebar-toggle" class="md:hidden text-white text-2xl mr-4">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="text-3xl font-bold text-white font-['Orbitron']">Dental Admin</h1>
+            </div>
+            <div class="relative flex-1 w-full md:w-auto">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                    <i class="fas fa-search"></i>
+                </div>
+                <input type="text" id="global-search" class="w-full pl-10 pr-4 py-2 rounded-full input-tech border-none focus:ring-2" placeholder="Search...">
+            </div>
+            <div class="flex items-center space-x-4 mt-4 md:mt-0 ml-0 md:ml-6">
+                <button class="p-2 rounded-full hover:bg-secondary-blue transition-colors">
+                    <i class="fas fa-bell text-white text-xl"></i>
+                </button>
+                <button class="p-2 rounded-full hover:bg-secondary-blue transition-colors">
+                    <i class="fas fa-user-circle text-white text-xl"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 p-6 overflow-y-auto">
+
+            <!-- Dynamic content will be loaded here -->
+            <div id="content-area">
+
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div id="totalPatients" class="card-glass p-6 rounded-lg text-center cursor-pointer">
+                        <i class="fas fa-users text-4xl text-white mb-2"></i>
+                        <h2 class="text-2xl font-bold text-white">Total Patients</h2>
+                        <p id="totalPatientsValue" class="text-4xl font-['Orbitron'] text-accent-red mt-2">0</p>
+                    </div>
+
+                    <div id="totalAppointments" class="card-glass p-6 rounded-lg text-center cursor-pointer">
+                        <i class="fas fa-calendar-alt text-4xl text-white mb-2"></i>
+                        <h2 class="text-2xl font-bold text-white">Total Appointments</h2>
+                        <p id="totalAppointmentsValue" class="text-4xl font-['Orbitron'] text-accent-red mt-2">0</p>
+                    </div>
+
+                    <div id="upcomingAppointments" class="card-glass p-6 rounded-lg text-center cursor-pointer">
+                        <i class="fas fa-clock text-4xl text-white mb-2"></i>
+                        <h2 class="text-2xl font-bold text-white">Upcoming Appointments</h2>
+                        <p id="upcomingAppointmentsValue" class="text-4xl font-['Orbitron'] text-accent-red mt-2">0</p>
+                    </div>
+
+                    <div id="pendingVisits" class="card-glass p-6 rounded-lg text-center cursor-pointer">
+                        <i class="fas fa-hospital text-4xl text-white mb-2"></i>
+                        <h2 class="text-2xl font-bold text-white">Pending Patient Visits</h2>
+                        <p id="pendingVisitsValue" class="text-4xl font-['Orbitron'] text-accent-red mt-2">0</p>
+                    </div>
+                </section>
+                
+                <!-- Upcoming Appointments Table (will be dynamically generated) -->
+                <section id="upcoming-appointments-table-container" class="mt-8 hidden">
+                    <h2 class="text-3xl font-bold text-white mb-4">Upcoming Appointments</h2>
+                    <div class="bg-secondary-blue p-6 rounded-lg overflow-x-auto">
+                        <table id="upcomingAppointmentsTable" class="w-full text-left table-auto">
+                            <thead>
+                                <tr class="border-b border-primary-blue">
+                                    <th class="py-3 px-4 text-white">Patient Name</th>
+                                    <th class="py-3 px-4 text-white">Service</th>
+                                    <th class="py-3 px-4 text-white">Date</th>
+                                    <th class="py-3 px-4 text-white">Time</th>
+                                    <th class="py-3 px-4 text-white">Status</th>
+                                    <th class="py-3 px-4 text-white">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="upcomingAppointmentsTableBody">
+                                <!-- Appointment rows will be dynamically inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                
+                <!-- Recent Patients Table (will be dynamically generated) -->
+                <section id="recent-patients-table-container" class="mt-8">
+                    <h2 class="text-3xl font-bold text-white mb-4">Recent Patients</h2>
+                    <div class="bg-secondary-blue p-6 rounded-lg overflow-x-auto">
+                        <table id="recentPatientsTable" class="w-full text-left table-auto">
+                            <thead>
+                                <tr class="border-b border-primary-blue">
+                                    <th class="py-3 px-4 text-white">Patient Name</th>
+                                    <th class="py-3 px-4 text-white">Email</th>
+                                    <th class="py-3 px-4 text-white">Phone</th>
+                                    <th class="py-3 px-4 text-white">Status</th>
+                                    <th class="py-3 px-4 text-white">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentPatientsTableBody">
+                                <!-- Patient rows will be dynamically inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Patient Visits Overview (will be dynamically generated) -->
+                <section id="patient-visits-overview-container" class="mt-8 hidden">
+                    <h2 class="text-3xl font-bold text-white mb-4">Recent Patient Visits</h2>
+                    <div class="bg-secondary-blue p-6 rounded-lg overflow-x-auto">
+                        <table id="patientVisitsOverviewTable" class="w-full text-left table-auto">
+                            <thead>
+                                <tr class="border-b border-primary-blue">
+                                    <th class="py-3 px-4 text-white">Patient Name</th>
+                                    <th class="py-3 px-4 text-white">Visit Date</th>
+                                    <th class="py-3 px-4 text-white">Reason</th>
+                                    <th class="py-3 px-4 text-white">Status</th>
+                                    <th class="py-3 px-4 text-white">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patientVisitsOverviewTableBody">
+                                <!-- Visit rows will be dynamically inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+
+                <!-- Team Management Section -->
+                <section id="team" class="hidden">
+                    <h2 class="text-3xl font-bold text-white mb-4">Team Management</h2>
+                    <button id="addTeamMemberBtn" class="btn-primary-tech px-6 py-3 rounded-full mb-6">Add Team Member</button>
+                    <div id="teamMembersList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Team member cards will be dynamically added here -->
+                    </div>
+                </section>
+                
+                <!-- Services Management Section -->
+                <section id="services" class="hidden">
+                    <h2 class="text-3xl font-bold text-white mb-4">Services Management</h2>
+                    <button id="addServiceBtn" class="btn-primary-tech px-6 py-3 rounded-full mb-6">Add New Service</button>
+                    <div id="servicesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Service cards will be dynamically added here -->
+                    </div>
+                </section>
+
+                <!-- Testimonials Section -->
+                <section id="testimonials" class="hidden">
+                    <h2 class="text-3xl font-bold text-white mb-4">Manage Testimonials</h2>
+                    <button id="showTestimonialsOverlayBtn" class="btn-primary-tech px-6 py-3 rounded-full mb-6">Manage Testimonials</button>
+                </section>
+                
+                <!-- Blog Management Section -->
+                <section id="blog" class="hidden">
+                    <h2 class="text-3xl font-bold text-white mb-4">Blog Management</h2>
+                    
+                    <!-- Create Blog Post Form -->
+                    <div class="bg-secondary-blue p-6 rounded-lg mb-8 card-glass">
+                        <h3 class="text-2xl font-bold text-white mb-4">Create New Blog Post</h3>
+                        <form id="createBlogPostForm" class="space-y-4">
+                            <div>
+                                <label for="post_title" class="block text-gray-300 text-sm font-bold mb-2">Title</label>
+                                <input type="text" id="post_title" name="post_title" class="input-tech w-full py-2 px-4 rounded-lg" placeholder="Blog Post Title" required>
+                            </div>
+                            <div>
+                                <label for="post_author" class="block text-gray-300 text-sm font-bold mb-2">Author</label>
+                                <input type="text" id="post_author" name="post_author" class="input-tech w-full py-2 px-4 rounded-lg" placeholder="Author Name" required>
+                            </div>
+                            <div>
+                                <label for="post_summary" class="block text-gray-300 text-sm font-bold mb-2">Summary</label>
+                                <textarea id="post_summary" name="post_summary" rows="3" class="input-tech w-full py-2 px-4 rounded-lg" placeholder="A brief summary of the blog post" required></textarea>
+                            </div>
+                            <div>
+                                <label for="post_content" class="block text-gray-300 text-sm font-bold mb-2">Content</label>
+                                <textarea id="post_content" name="post_content" rows="8" class="input-tech w-full py-2 px-4 rounded-lg" placeholder="Full content of the blog post" required></textarea>
+                            </div>
+                            <div>
+                                <label for="post_image_file" id="post_image_file_label" class="custom-file-upload">
+                                    <i class="fas fa-cloud-upload-alt"></i> Upload Image
+                                </label>
+                                <input type="file" id="post_image_file" name="post_image_file" accept="image/*">
+                            </div>
+                            <button type="submit" class="btn-primary-tech px-6 py-3 rounded-full mt-4">Publish Post</button>
+                        </form>
+                    </div>
+
+                    <!-- Manage Existing Blog Posts Section -->
+                    <div class="bg-secondary-blue p-6 rounded-lg card-glass">
+                        <h3 class="text-2xl font-bold text-white mb-4">Existing Blog Posts</h3>
+                        <div id="blogPostsList" class="space-y-4">
+                            <!-- Blog post cards will be dynamically added here -->
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+        </main>
+    </div>
+
+    <!-- The Patient Overlay with Search -->
+    <div id="allPatientsOverlay" class="all-patients-overlay">
+        <div class="relative mb-4">
+            <input type="text" placeholder="Search patient by name" class="input-tech w-full pl-10 pr-4 py-2 rounded-lg focus:ring-2 focus:ring-offset-2 focus:ring-offset-bg-dark-primary" id="patient-search-input">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 " id="search-patient-btn"></i>
+        </div>
+        <div class="all-patients-content card-glass relative">
+            <span id="closeAllPatientsOverlay" class="close-button cursor-pointer">&times;</span>
+            <h2 class="text-3xl font-bold text-white mb-6">All Patients</h2>
+            <div class="flex items-center mb-4">
+                <input type="text" id="patientSearchInput" class="input-tech w-full py-2 px-4 rounded-lg" placeholder="Search by name, email, or phone...">
+            </div>
+            <div id="patientListContainer" class="scrollable-content-patients space-y-4 p-4">
+                <!-- Patient list will be dynamically populated here -->
+                <div id="patientList">
+                    <!-- Initial patient data or search results will be displayed here -->
+                </div>
+                <div id="no-patients-found" class="hidden text-center text-gray-400 mt-4">
+                    No patients found.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Patient Details Overlay -->
+    <div id="viewPatientDetailsOverlay" class="view-patient-details-overlay">
+        <div class="view-patient-details-content card-glass relative">
+            <span id="closeViewPatientDetailsOverlay" class="close-button cursor-pointer">&times;</span>
+            <h2 class="text-3xl font-bold text-white mb-6">Patient Details</h2>
+            <div id="patientDetails" class="space-y-4">
+                <!-- Patient details will be dynamically populated here -->
+                <p><strong>Name:</strong> <span id="viewPatientName"></span></p>
+                <p><strong>Email:</strong> <span id="viewPatientEmail"></span></p>
+                <p><strong>Phone:</strong> <span id="viewPatientPhone"></span></p>
+                <p><strong>Status:</strong> <span id="viewPatientStatus"></span></p>
+                <p><strong>Visits:</strong></p>
+                <div id="viewPatientVisitsList" class="scrollable-content-visits space-y-2 p-2">
+                    <!-- Visits will be dynamically populated here -->
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end space-x-4">
+                <button id="updatePatientBtn" class="btn-primary-tech px-6 py-3 rounded-full">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Patient Details Overlay -->
+    <div id="updatePatientOverlay" class="update-patient-overlay">
+        <div class="update-patient-content card-glass relative">
+            <span id="closeUpdatePatientOverlay" class="close-button cursor-pointer">&times;</span>
+            <h2 class="text-3xl font-bold text-white mb-6">Update Patient</h2>
+            <form id="updatePatientForm" class="space-y-4">
+                <input type="hidden" id="updatePatientId">
+                <div>
+                    <label for="updatePatientNameInput" class="block text-gray-300 text-sm font-bold mb-2">Name</label>
+                    <input type="text" id="updatePatientNameInput" name="name" class="input-tech w-full py-2 px-4 rounded-lg" required>
+                </div>
+                <div>
+                    <label for="updatePatientEmailInput" class="block text-gray-300 text-sm font-bold mb-2">Email</label>
+                    <input type="email" id="updatePatientEmailInput" name="email" class="input-tech w-full py-2 px-4 rounded-lg" required>
+                </div>
+                <div>
+                    <label for="updatePatientPhoneInput" class="block text-gray-300 text-sm font-bold mb-2">Phone</label>
+                    <input type="text" id="updatePatientPhoneInput" name="phone" class="input-tech w-full py-2 px-4 rounded-lg" required>
+                </div>
+                <div>
+                    <label for="updatePatientStatusInput" class="block text-gray-300 text-sm font-bold mb-2">Status</label>
+                    <input type="text" id="updatePatientStatusInput" name="status" class="input-tech w-full py-2 px-4 rounded-lg" required>
+                </div>
+                <div class="mt-6 flex justify-end space-x-4">
+                    <button type="submit" class="btn-primary-tech px-6 py-3 rounded-full">Save Changes</button>
+                    <button type="button" id="cancelUpdatePatient" class="btn-secondary-tech px-6 py-3 rounded-full">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Appointment Overlay -->
+    <div id="viewAppointmentOverlay" class="view-appointment-overlay">
+        <div class="bg-secondary-blue p-8 rounded-xl shadow-2xl relative w-11/12 max-w-xl text-white">
+            <button id="closeAppointmentOverlayBtn" class="close-button">&times;</button>
+            <h2 class="text-3xl font-bold mb-6 text-center">Appointment Details</h2>
+            <div id="appointmentDetailsContent" class="space-y-4 text-lg">
+                <!-- Appointment details will be injected here -->
+            </div>
+            <div class="mt-6 flex justify-end space-x-4">
+                <button id="acceptAppointmentBtn" class="btn-primary-tech px-6 py-3 rounded-full">Accept</button>
+                <button id="declineAppointmentBtn" class="bg-gray-500 text-white px-6 py-3 rounded-full hover:bg-gray-600 transition-colors">Decline</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Manage Testimonials Overlay -->
+    <div id="manageTestimonialsOverlay" class="manage-testimonials-overlay">
+        <div class="bg-secondary-blue p-8 rounded-xl shadow-2xl relative w-11/12 max-w-3xl text-white">
+            <button id="closeManageTestimonialsOverlayBtn" class="close-button">&times;</button>
+            <h2 class="text-3xl font-bold mb-6 text-center">Manage Testimonials</h2>
+            <div id="testimonialAdminSummaryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Testimonial summaries will be dynamically injected here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Full Testimonial Display Overlay -->
+    <div id="fullTestimonialDisplayOverlay" class="full-testimonial-display-admin">
+        <button id="closeFullTestimonialDisplayBtn" class="close-button">&times;</button>
+        <h3 id="fullTestimonialName" class="text-2xl font-bold mb-2"></h3>
+        <p id="fullTestimonialContent" class="text-lg text-gray-300 mb-4 text-center"></p>
+        <div class="flex space-x-4">
+            <button id="approveTestimonialBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full transition-colors">Approve</button>
+            <button id="denyTestimonialBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full transition-colors">Deny</button>
+        </div>
+    </div>
+    
+    <!-- View Patient Visit Details Overlay -->
+    <div id="viewVisitDetailsOverlay" class="view-visit-details-overlay">
+        <div class="view-visit-details-content card-glass relative">
+            <span id="closeViewVisitDetailsOverlay" class="close-button cursor-pointer">&times;</span>
+            <h2 class="text-3xl font-bold text-white mb-6">Patient Visit Details</h2>
+            <div id="visitDetails" class="space-y-4">
+                <!-- Visit details will be dynamically populated here -->
+                <p><strong>Patient Name:</strong> <span id="visitPatientName"></span></p>
+                <p><strong>Visit Date:</strong> <span id="visitDate"></span></p>
+                <p><strong>Reason for Visit:</strong> <span id="visitReason"></span></p>
+                <p><strong>Diagnosis:</strong> <span id="visitDiagnosis"></span></p>
+                <p><strong>Treatment:</strong> <span id="visitTreatment"></span></p>
+                <p><strong>Notes:</strong> <span id="visitNotes"></span></p>
+                <p><strong>Status:</strong> <span id="visitStatus"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Team Member Overlay -->
+    <div id="updateTeamMemberOverlay" class="update-member-overlay">
+        <div class="update-member-content card-glass relative">
+            <span id="closeUpdateMemberOverlay" class="close-button cursor-pointer">&times;</span>
+            <h2 class="text-3xl font-bold text-white mb-6">Update Team Member</h2>
+            <form id="updateTeamMemberForm" class="space-y-4">
+                <input type="hidden" id="updateMemberId">
+                <div>
+                    <label for="updateMemberName" class="block text-gray-300 text-sm font-bold mb-2">Name</label>
+                    <input type="text" id="updateMemberName" name="name" class="input-tech w-full py-2 px-4 rounded-lg" required>
+                </div>
+                <div>
+                    <label for="updateMemberRole" class="block text-gray-300 text-sm font-bold mb-2">Role</label>
+                    <input type="text" id="updateMemberRole" name="role" class="input-tech w-full py-2 px-4 rounded-lg" required>
+                </div>
+                <div>
+                    <label for="updateMemberDescription" class="block text-gray-300 text-sm font-bold mb-2">Description</label>
+                    <textarea id="updateMemberDescription" name="description" rows="3" class="input-tech w-full py-2 px-4 rounded-lg" required></textarea>
+                </div>
+                <div>
+                    <label for="updateMemberImage" class="block text-gray-300 text-sm font-bold mb-2">Image</label>
+                    <label for="updateMemberImageFile" id="updateMemberImageFileLabel" class="custom-file-upload">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload Image
+                    </label>
+                    <input type="file" id="updateMemberImageFile" name="image" accept="image/*">
+                </div>
+                <div class="flex justify-end mt-4 space-x-4">
+                    <button type="submit" class="btn-primary-tech px-6 py-3 rounded-full">Save Changes</button>
+                    <button type="button" id="cancelUpdateMemberBtn" class="btn-secondary-tech px-6 py-3 rounded-full">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Update Service Overlay -->
+    <div id="editServiceOverlay" class="edit-service-overlay">
+        <div class="edit-service-content card-glass relative">
+            <span id="closeEditServiceOverlay" class="close-button cursor-pointer">&times;</span>
+            <h2 class="text-3xl font-bold text-white mb-6">Edit Service</h2>
+            <form id="editServiceForm" class="space-y-4">
+                <input type="hidden" id="editServiceId">
+                <div>
+                    <label for="editServiceTitle" class="block text-gray-300 text-sm font-bold mb-2">Title</label>
+                    <input type="text" id="editServiceTitle" name="title" class="input-tech w-full py-2 px-4 rounded-lg" required>
+                </div>
+                <div>
+                    <label for="editServiceDescription" class="block text-gray-300 text-sm font-bold mb-2">Description</label>
+                    <textarea id="editServiceDescription" name="description" rows="3" class="input-tech w-full py-2 px-4 rounded-lg" required></textarea>
+                </div>
+                <div>
+                    <label for="editServiceImage" class="block text-gray-300 text-sm font-bold mb-2">Image</label>
+                    <label for="editServiceImageFile" id="editServiceImageFileLabel" class="custom-file-upload">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload New Image
+                    </label>
+                    <input type="file" id="editServiceImageFile" name="image" accept="image/*">
+                </div>
+                <div class="flex justify-end mt-4 space-x-4">
+                    <button type="submit" class="btn-primary-tech px-6 py-3 rounded-full">Save Changes</button>
+                    <button type="button" id="cancelEditServiceBtn" class="btn-secondary-tech px-6 py-3 rounded-full">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Blog Post Edit Overlay -->
+    <div id="editBlogPostOverlay" class="view-patient-details-overlay">
+        <div class="update-member-content card-glass relative">
+            <span id="closeEditBlogPostOverlay" class="close-button cursor-pointer">&times;</span>
+            <h2 class="text-3xl font-bold text-white mb-6">Edit Blog Post</h2>
+            <form id="editBlogPostForm" class="space-y-4">
+                <input type="hidden" id="editBlogPostId">
+                <div>
+                    <label for="edit_post_title" class="block text-gray-300 text-sm font-bold mb-2">Title</label>
+                    <input type="text" id="edit_post_title" name="post_title" class="input-tech w-full py-2 px-4 rounded-lg" required>
+                </div>
+                <div>
+                    <label for="edit_post_author" class="block text-gray-300 text-sm font-bold mb-2">Author</label>
+                    <input type="text" id="edit_post_author" name="post_author" class="input-tech w-full py-2 px-4 rounded-lg" required>
+                </div>
+                <div>
+                    <label for="edit_post_summary" class="block text-gray-300 text-sm font-bold mb-2">Summary</label>
+                    <textarea id="edit_post_summary" name="post_summary" rows="3" class="input-tech w-full py-2 px-4 rounded-lg" required></textarea>
+                </div>
+                <div>
+                    <label for="edit_post_content" class="block text-gray-300 text-sm font-bold mb-2">Content</label>
+                    <textarea id="edit_post_content" name="post_content" rows="8" class="input-tech w-full py-2 px-4 rounded-lg" required></textarea>
+                </div>
+                <div>
+                    <label for="edit_post_image_file" id="edit_post_image_file_label" class="custom-file-upload">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload New Image
+                    </label>
+                    <input type="file" id="edit_post_image_file" name="post_image_file" accept="image/*">
+                </div>
+                <div class="flex justify-end mt-4 space-x-4">
+                    <button type="submit" class="btn-primary-tech px-6 py-3 rounded-full">Save Changes</button>
+                    <button type="button" id="cancelEditBlogPostBtn" class="btn-secondary-tech px-6 py-3 rounded-full">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+                document.addEventListener('DOMContentLoaded', function () {
+            // --- Existing Functions from your original code snippet ---
+
+            // Function to show toast notifications
+            function showToast(message, duration = 3000) {
+                const toast = document.getElementById('toast-notification');
+                toast.textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, duration);
+            }
+
+            // Function to update the file input label
+            function updateLabel(fileInput, labelId) {
+                const label = document.getElementById(labelId);
+                if (fileInput.files.length > 0) {
+                    label.textContent = fileInput.files[0].name;
+                } else {
+                    label.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload Image';
+                }
+            }
+
+            // --- Event Listeners for Existing Functionality ---
+
+            // Listen for changes to the blog post image file input
+            const postImageInput = document.getElementById('post_image_file');
+            if (postImageInput) {
+                postImageInput.addEventListener('change', (event) => {
+                    updateLabel(event.target, 'post_image_file_label');
+                });
+            }
+
+            // Blog post form submission
+            const createBlogPostForm = document.getElementById('createBlogPostForm');
+            if (createBlogPostForm) {
+                createBlogPostForm.addEventListener('submit', async function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(this);
+
+                    // Basic validation
+                    if (!formData.get('post_title') || !formData.get('post_content')) {
+                        showToast("Please fill in all required fields for the blog post.");
+                        return;
+                    }
+
+                    try {
+                        // Placeholder URL - REPLACE WITH YOUR ACTUAL BACKEND ENDPOINT
+                        const response = await fetch("https://hhxsq4xb-8000.uks1.devtunnels.ms/post_blog", {
+                            method: "POST",
+                            body: formData
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok && data[0].response === 'successful') {
+                            showToast("Blog post published successfully!");
+                            createBlogPostForm.reset();
+                            updateLabel(document.getElementById('post_image_file'), 'post_image_file_label');
+                            // Reload page to show new post, or add dynamic rendering logic
+                            location.reload();
+                        } else {
+                            showToast(data[0].response || "Failed to publish blog post.");
+                        }
+                    } catch (error) {
+                        console.error("Error publishing blog post:", error);
+                        showToast("Error publishing blog post.");
+                    }
+                });
+            }
+
+            // Admin login form submission
+            const adminLoginForm = document.getElementById('adminLoginForm');
+            if (adminLoginForm) {
+                adminLoginForm.addEventListener('submit', async function(event) {
+                    event.preventDefault();
+                    const password = document.getElementById('admin_password').value;
+
+                    try {
+                        // Placeholder URL - REPLACE WITH YOUR ACTUAL BACKEND ENDPOINT
+                        const response = await fetch('https://hhxsq4xb-8000.uks1.devtunnels.ms/admin_login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ password: password })
+                        });
+                        const data = await response.json();
+
+                        if (response.ok && data.response === 'successful') {
+                            // Login successful, redirect or show main content
+                            showToast('Login successful!');
+                            document.body.classList.remove('auth-required');
+                            document.getElementById('adminLoginOverlay').classList.remove('visible');
+                        } else {
+                            showToast('Invalid password.');
+                        }
+                    } catch (error) {
+                        console.error('Error during login:', error);
+                        // Log the specific error to the console to aid in debugging the backend URL
+                        console.error('Failed to connect to the backend URL. Please check if the server is running and the URL is correct.');
+                        showToast('An error occurred during login. Check the console for details.');
+                    }
+                });
+            }
+
+            // Other overlay and navigation handlers...
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('main section');
+            const contentArea = document.getElementById('content-area');
+            const closeUpdateMemberOverlay = document.getElementById('closeUpdateMemberOverlay');
+            const updateMemberOverlay = document.getElementById('updateTeamMemberOverlay');
+            const closeEditServiceOverlay = document.getElementById('closeEditServiceOverlay');
+            const editServiceOverlay = document.getElementById('editServiceOverlay');
+            const closeEditBlogPostOverlay = document.getElementById('closeEditBlogPostOverlay');
+            const editBlogPostOverlay = document.getElementById('editBlogPostOverlay');
+
+            // Toggle sidebar on mobile
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                sidebarOverlay.classList.toggle('active');
+            });
+            sidebarOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+            });
+
+            // Close update member overlay
+            if (closeUpdateMemberOverlay) {
+                closeUpdateMemberOverlay.addEventListener('click', () => {
+                    updateMemberOverlay.classList.remove('visible');
+                });
+            }
+            // Close edit service overlay
+            if (closeEditServiceOverlay) {
+                closeEditServiceOverlay.addEventListener('click', () => {
+                    editServiceOverlay.classList.remove('visible');
+                });
+            }
+            // Close edit blog post overlay
+            if (closeEditBlogPostOverlay) {
+                closeEditBlogPostOverlay.addEventListener('click', () => {
+                    editBlogPostOverlay.classList.remove('visible');
+                });
+            }
+
+            // Handle navigation clicks
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // Close sidebar on mobile
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('active');
+
+                    // Update active link class
+                    navLinks.forEach(item => item.classList.remove('active'));
+                    link.classList.add('active');
+
+                    // Get target section ID
+                    const targetId = link.getAttribute('href').substring(1);
+
+                    // Hide all content sections
+                    contentSections.forEach(section => section.classList.add('hidden'));
+
+                    // Show the target section
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.classList.remove('hidden');
+                    }
+                });
+            });
+
+            // Set initial active link and show dashboard
+            const initialNavLink = document.querySelector('.nav-link[href="#dashboard"]');
+            if (initialNavLink) {
+                initialNavLink.classList.add('active');
+            }
+            const dashboardSection = document.getElementById('dashboard');
+            if (dashboardSection) {
+                dashboardSection.classList.remove('hidden');
+            }
+
+            // --- NEW PATIENT OVERLAY FUNCTIONALITY ---
+
+            const totalPatientsCard = document.getElementById('totalPatients');
+            const allPatientsOverlay = document.getElementById('allPatientsOverlay');
+            const closeAllPatientsOverlayBtn = document.getElementById('closeAllPatientsOverlay');
+            const patientSearchInput = document.getElementById('patientSearchInput');
+            const patientListContainer = document.getElementById('patientList');
+            const noPatientsFoundMessage = document.getElementById('no-patients-found');
+            const viewPatientDetailsOverlay = document.getElementById('viewPatientDetailsOverlay');
+            const closeViewPatientDetailsOverlayBtn = document.getElementById('closeViewPatientDetailsOverlay');
+            const updatePatientOverlay = document.getElementById('updatePatientOverlay');
+            const closeUpdatePatientOverlayBtn = document.getElementById('closeUpdatePatientOverlay');
+            const updatePatientForm = document.getElementById('updatePatientForm');
+
+            // Function to render patient data
+            function renderPatients(patients) {
+                patientListContainer.innerHTML = ''; // Clear previous content
+                if (patients && patients.length > 0) {
+                    noPatientsFoundMessage.classList.add('hidden');
+                    patients.forEach(patient => {
+                        const patientCard = document.createElement('div');
+                        patientCard.className = 'card-glass p-4 rounded-lg flex items-center justify-between transition-transform duration-200 hover:scale-[1.01]';
+                        patientCard.innerHTML = `
+                            <div>
+                                <p class="font-bold text-lg">${patient.name}</p>
+                                <p class="text-sm text-gray-400">${patient.email}</p>
+                                <p class="text-sm text-gray-400">${patient.phone}</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="btn-primary-tech px-4 py-2 rounded-full view-patient-btn" data-patient-id="${patient.id}">View</button>
+                                <button class="btn-secondary-tech px-4 py-2 rounded-full update-patient-btn" data-patient-id="${patient.id}">Update</button>
+                            </div>
+                        `;
+                        patientListContainer.appendChild(patientCard);
+                    });
+                    // Attach event listeners to the new buttons
+                    patientListContainer.querySelectorAll('.view-patient-btn').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const patientId = e.target.getAttribute('data-patient-id');
+                            // You will need to implement a function to fetch and display patient details
+                            // For now, let's just show the overlay
+                            showViewPatientDetailsOverlay(patientId);
+                        });
+                    });
+                    patientListContainer.querySelectorAll('.update-patient-btn').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const patientId = e.target.getAttribute('data-patient-id');
+                            // You will need to implement a function to fetch patient data and populate the form
+                            // For now, let's just show the overlay
+                            showUpdatePatientOverlay(patientId);
+                        });
+                    });
+                } else {
+                    noPatientsFoundMessage.classList.remove('hidden');
+                }
+            }
+
+            // Function to fetch all patients and render them
+            async function fetchAndRenderAllPatients() {
+                patientListContainer.innerHTML = '<div class="text-center text-gray-400">Loading patients...</div>';
+                noPatientsFoundMessage.classList.add('hidden');
+                try {
+                    // Placeholder URL - REPLACE WITH YOUR ACTUAL BACKEND ENDPOINT
+                    const response = await fetch('https://example.com/get_all_patients');
+                    const patients = await response.json();
+                    renderPatients(patients);
+                } catch (error) {
+                    console.error('Error fetching all patients:', error);
+                    patientListContainer.innerHTML = '<div class="text-center text-red-400">Failed to load patients.</div>';
+                }
+            }
+
+            // Function to search patients
+            async function searchPatients(query) {
+                patientListContainer.innerHTML = '<div class="text-center text-gray-400">Searching...</div>';
+                noPatientsFoundMessage.classList.add('hidden');
+                try {
+                    // Placeholder URL - REPLACE WITH YOUR ACTUAL BACKEND ENDPOINT
+                    const response = await fetch('https://example.com/search_patients', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ input: query })
+                    });
+                    const patients = await response.json();
+                    renderPatients(patients);
+                } catch (error) {
+                    console.error('Error searching for patients:', error);
+                    patientListContainer.innerHTML = '<div class="text-center text-red-400">Failed to perform search.</div>';
+                }
+            }
+
+            // Debounce function to limit API calls on user input
+            function debounce(func, delay) {
+                let timeout;
+                return function(...args) {
+                    const context = this;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(context, args), delay);
+                };
+            }
+
+            // Event listener for the search input with debounce
+            const debouncedSearch = debounce(searchPatients, 500); // 500ms delay
+            patientSearchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                if (query.length > 0) {
+                    debouncedSearch(query);
+                } else {
+                    // If the search bar is cleared, show all patients again
+                    fetchAndRenderAllPatients();
+                }
+            });
+
+            // Show the patient overlay when the Total Patients card is clicked
+            if (totalPatientsCard) {
+                totalPatientsCard.addEventListener('click', () => {
+                    allPatientsOverlay.classList.add('visible');
+                    fetchAndRenderAllPatients(); // Load all patients on initial open
+                });
+            }
+
+            // Close the patient overlay
+            if (closeAllPatientsOverlayBtn) {
+                closeAllPatientsOverlayBtn.addEventListener('click', () => {
+                    allPatientsOverlay.classList.remove('visible');
+                    patientSearchInput.value = ''; // Clear search input
+                    // Reset content or hide it
+                    patientListContainer.innerHTML = '';
+                });
+            }
+
+            // Close the view patient details overlay
+            if (closeViewPatientDetailsOverlayBtn) {
+                closeViewPatientDetailsOverlayBtn.addEventListener('click', () => {
+                    viewPatientDetailsOverlay.classList.remove('visible');
+                });
+            }
+
+            // Close the update patient details overlay
+            if (closeUpdatePatientOverlayBtn) {
+                closeUpdatePatientOverlayBtn.addEventListener('click', () => {
+                    updatePatientOverlay.classList.remove('visible');
+                });
+            }
+
+            // Placeholder functions for showing other overlays (You need to implement these)
+            async function showViewPatientDetailsOverlay(patientId) {
+                // Placeholder: Fetch patient details for the given ID and populate the overlay
+                viewPatientDetailsOverlay.classList.add('visible');
+            }
+
+            async function showUpdatePatientOverlay(patientId) {
+                // Placeholder: Fetch patient details for the given ID and populate the form
+                updatePatientOverlay.classList.add('visible');
+            }
+
+            // --- END OF NEW PATIENT OVERLAY FUNCTIONALITY ---
+
+        });
+
+    </script>
+</body>
+</html>

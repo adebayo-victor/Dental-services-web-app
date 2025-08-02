@@ -1,0 +1,159 @@
+from cs50 import SQL
+from datetime import datetime
+
+# Connect to DB
+db = SQL("sqlite:///dental.db")
+
+# -- Tables Creation --
+
+# Clinic Info
+db.execute("""
+CREATE TABLE IF NOT EXISTS clinic_info (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    clinic_name TEXT NOT NULL,
+    address TEXT NOT NULL,
+    phone_number TEXT NOT NULL,
+    email TEXT NOT NULL,
+    operating_hours TEXT,
+    tagline TEXT,
+    facebook_url TEXT,
+    instagram_url TEXT,
+    twitter_url TEXT,
+    maps_embed_url TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+# Services
+db.execute("""
+CREATE TABLE IF NOT EXISTS services (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    price REAL,
+    fa_icon_class TEXT,
+    is_active INTEGER DEFAULT 1,
+    display_order INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+# Testimonials
+db.execute("""
+CREATE TABLE IF NOT EXISTS testimonials (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    quote TEXT NOT NULL,
+    author_name TEXT NOT NULL,
+    author_description TEXT,
+    is_approved INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+# Team Members
+db.execute("""
+CREATE TABLE IF NOT EXISTS team_members (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    position TEXT NOT NULL,
+    specialization TEXT,
+    bio TEXT,
+    image_url TEXT,
+    is_active INTEGER DEFAULT 1,
+    display_order INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+# Blog Posts
+db.execute("""
+CREATE TABLE IF NOT EXISTS blog_posts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    content TEXT NOT NULL,
+    author_id INTEGER,
+    published_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    featured_image_url TEXT,
+    is_published INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+# Patients
+db.execute("""
+CREATE TABLE IF NOT EXISTS patients (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    full_name TEXT NOT NULL,
+    email TEXT,
+    phone TEXT,
+    gender TEXT,
+    date_of_birth DATE,
+    address TEXT,
+    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+# Appointments
+db.execute("""
+CREATE TABLE IF NOT EXISTS appointments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient_id INTEGER NOT NULL,
+    appointment_date DATE NOT NULL,
+    appointment_time TIME NOT NULL,
+    appointment_code TEXT UNIQUE NOT NULL,
+    message TEXT,
+    status TEXT DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(patient_id) REFERENCES patients(id)
+)
+""")
+
+# Users
+db.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    role TEXT DEFAULT 'admin',
+    is_active INTEGER DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+# -- Insert Sample Dumps --
+
+now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+db.execute("INSERT INTO clinic_info (clinic_name, address, phone_number, email, operating_hours, tagline) VALUES (?, ?, ?, ?, ?, ?)", 
+           "Zaclice Dental Care", "123 Dental Street", "08012345678", "clinic@example.com", "Mon–Fri: 9am–5pm", "Brightening Smiles Daily")
+
+db.execute("INSERT INTO services (name, description, price, fa_icon_class) VALUES (?, ?, ?, ?)", 
+           "Teeth Cleaning", "Professional dental cleaning to remove plaque and tartar.", 10000.00, "fas fa-tooth")
+
+db.execute("INSERT INTO testimonials (quote, author_name, author_description, is_approved) VALUES (?, ?, ?, ?)", 
+           "They saved my smile!", "Sarah T.", "Patient since 2022", 1)
+
+db.execute("INSERT INTO team_members (name, position, specialization, bio, image_url) VALUES (?, ?, ?, ?, ?)", 
+           "Dr. Kelvin White", "Chief Dentist", "Orthodontics", "Experienced orthodontist with a love for perfecting smiles.", "https://example.com/drkelvin.jpg")
+
+db.execute("INSERT INTO blog_posts (title, slug, content) VALUES (?, ?, ?)", 
+           "Why Regular Checkups Matter", "regular-checkups", "Dental checkups help prevent major oral issues.")
+
+db.execute("INSERT INTO patients (full_name, email, phone, gender, date_of_birth, address) VALUES (?, ?, ?, ?, ?, ?)", 
+           "Victor Light", "victor@example.com", "08098765432", "Male", "1999-09-09", "Lagos, Nigeria")
+
+db.execute("INSERT INTO appointments (patient_id, appointment_date, appointment_time, appointment_code, message) VALUES (?, ?, ?, ?, ?)", 
+           1, "2025-07-12", "14:00", "APPT-VIC-20250712", "Mild toothache and cleaning needed")
+
+db.execute("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)", 
+           "admin", "admin@dental.com", "hashedpassword123")
+
+print("✅ All tables created and sample data dumped.")

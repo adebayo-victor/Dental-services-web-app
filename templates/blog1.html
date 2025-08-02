@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dental Insights - Dynamic Blog</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom Colors (aligned with your admin dashboard theme for consistency) */
+    :root {
+        --primary-blue: #0F1E5E;   /* Deep Blue */
+        --secondary-blue: #1A2B6A; /* Slightly lighter blue for cards/elements */
+        --accent-red: #E00000;     /* Vibrant Red */
+        --text-light: #F0F0F0;     /* Light Off-White Text */
+        --bg-dark-primary: #0B1641; /* Very dark background */
+        --card-bg: #FFFFFF;       /* White background for blog cards */
+        --text-dark: #2d3748;      /* Dark text for content on white background */
+        --shadow-subtle: rgba(0, 0, 0, 0.05);
+        --shadow-medium: rgba(0, 0, 0, 0.2);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      color: var(--text-dark);
+      line-height: 1.6;
+      overflow-x: hidden; /* Prevent horizontal scroll from layout shifts */
+      min-height: 100vh; /* Ensure body takes full height */
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Main Container for the entire dynamic section */
+    .dynamic-blog-container {
+      position: relative;
+      width: 100%;
+      min-height: calc(100vh - 120px); /* Adjust based on carousel height */
+      display: flex;
+      align-items: center; /* Vertically center content */
+      padding: 2rem;
+      box-sizing: border-box;
+      flex-grow: 1;
+    }
+
+    .hero-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      transition: background-image 0.8s ease-in-out; /* Smooth transition for background image */
+      z-index: -2; /* Behind overlay and content */
+    }
+
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.75); /* Darker overlay for text readability */
+      z-index: -1; /* Between background and content */
+    }
+
+    /* Content display on the left */
+    .main-blog-content-display {
+      position: relative;
+      z-index: 0;
+      max-width: 700px; /* Max width for the content block */
+      margin-left: 5%; /* Push content block to the left */
+      color: var(--text-light);
+      padding: 1.5rem 2rem; /* Internal padding for text */
+      animation: fadeInScale 0.6s ease-out forwards; /* Initial animation for content */
+      opacity: 0;
+      transform: translateY(20px); /* Start slightly below for fade-in-up effect */
+
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start; /* Align children to the start (left) */
+      text-align: left; /* Ensure text inside is left-aligned */
+    }
+
+    .main-blog-content-display.active {
+        animation: fadeInScale 0.6s ease-out forwards; /* Re-trigger animation on change */
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .main-blog-content-display h2 {
+      font-family: 'Orbitron', sans-serif; /* Use Orbitron for the main title */
+      font-size: 3.5rem; /* Larger and bold as per Pinterest example */
+      font-weight: 700;
+      color: var(--text-light); /* Light text for contrast */
+      margin-bottom: 0.75rem;
+      line-height: 1.1;
+      text-shadow: 3px 3px 8px rgba(0,0,0,0.6); /* More prominent shadow for contrast */
+      text-transform: uppercase; /* Match the bold, uppercase style */
+    }
+
+    .main-blog-content-display .blog-meta {
+      font-size: 1rem;
+      color: rgba(240, 240, 240, 0.8);
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .main-blog-content-display .blog-meta i {
+        color: var(--accent-red);
+    }
+
+    .main-blog-content-display p {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: var(--text-light);
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+      max-height: 250px; /* Allow more content to be visible */
+      overflow-y: auto; /* Add scroll if content is too long */
+      padding-right: 15px; /* Space for scrollbar */
+    }
+
+    /* Custom Scrollbar for main content */
+    .main-blog-content-display p::-webkit-scrollbar {
+        width: 8px;
+    }
+    .main-blog-content-display p::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+    .main-blog-content-display p::-webkit-scrollbar-thumb {
+        background-color: var(--accent-red);
+        border-radius: 10px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+    .main-blog-content-display p::-webkit-scrollbar-thumb:hover {
+        background-color: #C00000;
+    }
+
+
+    /* Blog Carousel at the Bottom */
+    .blog-carousel-container {
+      position: relative; /* Not sticky, part of the flow */
+      width: 100%;
+      background-color: var(--bg-dark-primary); /* Dark background for the carousel */
+      padding: 1rem 0;
+      box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.4);
+      z-index: 10;
+      overflow-x: auto; /* Enable horizontal scrolling */
+      -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+
+    .blog-carousel {
+      display: flex;
+      gap: 1rem;
+      padding: 0 2rem; /* Padding for the sides of the carousel */
+      padding-bottom: 15px; /* Space for scrollbar */
+      align-items: flex-end; /* Align cards to the bottom */
+    }
+
+    /* Custom Scrollbar for Carousel */
+    .blog-carousel-container::-webkit-scrollbar {
+        height: 8px;
+    }
+    .blog-carousel-container::-webkit-scrollbar-track {
+        background: var(--primary-blue);
+        border-radius: 10px;
+    }
+    .blog-carousel-container::-webkit-scrollbar-thumb {
+        background-color: var(--accent-red);
+        border-radius: 10px;
+        border: 2px solid var(--primary-blue);
+    }
+    .blog-carousel-container::-webkit-scrollbar-thumb:hover {
+        background-color: #C00000;
+    }
+
+    .carousel-card {
+      flex-shrink: 0; /* Prevent cards from shrinking */
+      width: 180px; /* Fixed width for cards */
+      height: 100px; /* Fixed height for cards */
+      background: transparent; /* Transparent background */
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease-in-out;
+      cursor: pointer;
+      border: 2px solid rgba(240, 240, 240, 0.15); /* Subtle border */
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .carousel-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+      border-color: var(--accent-red); /* Red border on hover */
+    }
+
+    .carousel-card.active {
+      border-color: var(--accent-red); /* Active border */
+      transform: scale(1.05); /* Slightly larger when active */
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .carousel-image {
+      width: 100%;
+      height: 100%; /* Image fills the card */
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .carousel-card:hover .carousel-image {
+        transform: scale(1.05);
+    }
+
+    .carousel-card-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6); /* Dark overlay for text readability */
+        display: flex;
+        align-items: flex-end; /* Align title to bottom */
+        padding: 0.5rem;
+        box-sizing: border-box;
+        transition: background-color 0.3s ease;
+    }
+
+    .carousel-card:hover .carousel-card-overlay {
+        background-color: rgba(0, 0, 0, 0.4); /* Lighter overlay on hover */
+    }
+
+    .carousel-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-light);
+      text-align: left;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; /* Limit title to 2 lines */
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .dynamic-blog-container {
+        padding: 1rem;
+        min-height: calc(100vh - 100px); /* Adjust for smaller carousel */
+      }
+      .main-blog-content-display {
+        margin-left: 0; /* Center content on smaller screens */
+        max-width: 90%;
+        padding: 1rem;
+        text-align: center; /* Center text on smaller screens */
+        align-items: center; /* Center children */
+      }
+      .main-blog-content-display h2 {
+        font-size: 2.5rem;
+      }
+      .main-blog-content-display .blog-meta {
+        justify-content: center; /* Center meta info */
+      }
+      .main-blog-content-display p {
+        font-size: 1rem;
+        max-height: 180px;
+      }
+      .blog-carousel-container {
+        padding: 0.75rem 0;
+      }
+      .blog-carousel {
+        padding: 0 1rem;
+        gap: 0.75rem;
+      }
+      .carousel-card {
+        width: 140px;
+        height: 80px;
+      }
+      .carousel-title {
+        font-size: 0.75rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .dynamic-blog-container {
+        padding: 0.5rem;
+        min-height: calc(100vh - 80px);
+      }
+      .main-blog-content-display {
+        max-width: 95%;
+        padding: 0.8rem;
+      }
+      .main-blog-content-display h2 {
+        font-size: 2rem;
+      }
+      .main-blog-content-display p {
+        font-size: 0.9rem;
+        max-height: 120px;
+      }
+      .blog-carousel-container {
+        padding: 0.5rem 0;
+      }
+      .blog-carousel {
+        padding: 0 0.5rem;
+        gap: 0.5rem;
+      }
+      .carousel-card {
+        width: 120px;
+        height: 70px;
+      }
+      .carousel-title {
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2gFLKPXNq4rVz/hzWj6ws+M4Vc/o9Zk8T+SVDu5zK32M4T2F+K3001vJkQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+  <div class="dynamic-blog-container">
+    <div id="hero-background" class="hero-background"></div>
+    <div class="hero-overlay"></div>
+    <div id="main-blog-content-display" class="main-blog-content-display">
+      <h2 id="main-blog-title"></h2>
+      <div id="main-blog-meta" class="blog-meta"></div>
+      <p id="main-blog-text"></p>
+    </div>
+  </div>
+
+  <div class="blog-carousel-container">
+    <div id="blog-carousel" class="blog-carousel">
+      {% for blog in blogs %}
+        <div class="carousel-card"
+             data-index="{{ loop.index0 }}"
+             data-title="{{ blog.title }}"
+             data-published-date="{{ blog.published_date }}"
+             data-author="{{ blog.author }}"
+             data-content="{{ blog.content | e }}" {# Escape content for data attribute #}
+             data-image-url="{{ blog.featured_image_url or 'https://placehold.co/400x200/0F1E5E/F0F0F0?text=Blog+Image' }}">
+          <img class="carousel-image" src="{{ blog.featured_image_url or 'https://placehold.co/180x100/0F1E5E/F0F0F0?text=Blog' }}" alt="Thumbnail: {{ blog.title }}" />
+          <div class="carousel-card-overlay">
+            <div class="carousel-title">{{ blog.title }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const heroBackground = document.getElementById('hero-background');
+      const mainBlogContentDisplay = document.getElementById('main-blog-content-display');
+      const mainBlogTitle = document.getElementById('main-blog-title');
+      const mainBlogMeta = document.getElementById('main-blog-meta');
+      const mainBlogText = document.getElementById('main-blog-text');
+      const blogCarousel = document.getElementById('blog-carousel');
+
+      // Store all blog data from the DOM for easy access
+      const allBlogPosts = [];
+      document.querySelectorAll('.carousel-card').forEach(card => {
+        allBlogPosts.push({
+          title: card.dataset.title,
+          publishedDate: card.dataset.publishedDate,
+          author: card.dataset.author,
+          content: card.dataset.content,
+          imageUrl: card.dataset.imageUrl
+        });
+
+        // Add click listener to each carousel card
+        card.addEventListener('click', () => {
+          const index = parseInt(card.dataset.index);
+          displayBlogPost(index);
+        });
+      });
+
+      // Function to display a blog post in the main section and update background
+      function displayBlogPost(index) {
+        if (index < 0 || index >= allBlogPosts.length) {
+          console.error('Invalid blog post index:', index);
+          return;
+        }
+
+        const blogPost = allBlogPosts[index];
+
+        // Update background image
+        heroBackground.style.backgroundImage = `url('${blogPost.imageUrl}')`;
+
+        // Update main blog content
+        // Add/remove 'active' class to re-trigger animation for content
+        mainBlogContentDisplay.classList.remove('active');
+        // A slight delay to ensure the class is removed and re-added, triggering animation
+        setTimeout(() => {
+            mainBlogTitle.textContent = blogPost.title;
+            mainBlogMeta.innerHTML = `
+                <i class="fas fa-calendar-alt"></i> <span>${blogPost.publishedDate}</span>
+                ${blogPost.author ? `<i class="fas fa-user"></i> <span>${blogPost.author}</span>` : ''}
+            `;
+            mainBlogText.textContent = blogPost.content; // Use textContent as content is escaped
+            mainBlogContentDisplay.classList.add('active');
+        }, 50);
+
+
+        // Update active state of carousel cards
+        document.querySelectorAll('.carousel-card').forEach((card, i) => {
+          if (i === index) {
+            card.classList.add('active');
+            // Optional: Scroll the active card into view if it's not fully visible
+            card.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+          } else {
+            card.classList.remove('active');
+          }
+        });
+      }
+
+      // Display the first blog post on initial load
+      if (allBlogPosts.length > 0) {
+        displayBlogPost(0);
+      }
+    });
+  </script>
+
+</body>
+</html>

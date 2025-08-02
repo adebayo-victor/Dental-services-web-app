@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gateway Dental Care - Your Smile, Our Priority</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='assets/css/fontawesome-all.min.css')}}" />
+    <style>
+        /* Custom scrollbar for a sleek look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f1e5e; /* Dark blue from logo */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E00000; /* Red from logo */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #C00000;
+        }
+
+        /* Subtle background patterns (abstract waves/lines inspired by logo) */
+        .hero-background-dental {
+            background-image: url('data:image/svg+xml;utf8,<svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="wave-lines" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M0 10 Q 5 5 10 10 T 20 10" stroke="%231a1a2e" stroke-width="0.3" fill="none"/></pattern></defs><rect width="100%" height="100%" fill="url(%23wave-lines)"/></svg>');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .section-pattern-dental {
+            background-image: url('data:image/svg+xml;utf8,<svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="dots-and-crosses" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="0.5" fill="%232C2C40"/><path d="M5 10 L15 10 M10 5 L10 15" stroke="%232C2C40" stroke-width="0.2"/></pattern></defs><rect width="100%" height="100%" fill="url(%23dots-and-crosses)"/></svg>');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .svg-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            stroke-width: 2;
+            stroke: currentColor;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Styling for the new service price overlay */
+        .service-price-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+            backdrop-filter: blur(8px); /* Blur the content behind the overlay */
+            -webkit-backdrop-filter: blur(8px); /* Safari support */
+            z-index: 1000; /* Ensure it's on top of everything */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .service-price-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .service-price-content {
+            background-color: #1A1A2E; /* Dark blue background */
+            padding: 2.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            max-width: 800px;
+            width: 90%;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            color: white; /* Ensure text is visible inside the content box */
+            max-height: 90vh; /* Limit height for scrollability */
+            overflow-y: auto; /* Enable scrolling for content */
+        }
+
+        .service-price-overlay.visible .service-price-content {
+            transform: translateY(0);
+        }
+
+        .close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #E00000;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-button:hover {
+            color: #C00000;
+        }
+
+        /* Styling for the list items inside the overlay */
+        .service-list {
+            list-style: none; /* Remove default bullet points */
+            padding: 0;
+        }
+
+        .service-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2C2C40; /* Background for each list item */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem; /* Space between items */
+            font-size: 1.125rem; /* text-lg */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .service-list li:last-child {
+            margin-bottom: 0; /* No margin after the last item */
+        }
+
+        .service-list li .service-name {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem; /* Space between icon and text */
+            color: white;
+            font-weight: 600; /* font-semibold */
+        }
+
+        .service-list li .service-price {
+            color: #E00000; /* Red color for price */
+            font-weight: bold;
+        }
+        .booking-confirmation-overlay {
+            /* ... other styles ... */
+            opacity: 0;
+            visibility: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+            backdrop-filter: blur(8px); /* Blur the content behind the overlay */
+            -webkit-backdrop-filter: blur(8px); /* Safari support */
+            z-index: 1000; /* Ensure it's on top of everything */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .booking-confirmation-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-z+rQ+9l+12A34A6K+4pS1/1V3Q2p+2m5s1t7x8w4w1/8/2F6D6T5eD6/7U6P5nQ2o0t7f4r9+w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body class="bg-[#1A1A2E] text-white font-sans antialiased">
+
+    <nav class="sticky top-0 z-50 bg-[#1A1A2E] bg-opacity-95 backdrop-blur-sm shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-3">
+                <img src="gateway.jpg" alt="Gateway Dental Care Logo" class="h-10 w-auto">
+                <span class="text-2xl font-bold text-white hover:text-[#E00000] transition-colors duration-300 hidden md:block">Gateway Dental Care</span>
+            </a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#hero" class="text-white hover:text-[#E00000] transition-colors duration-300 text-lg">Home</a>
+                <a href="#services" class="text-white hover:text-[#E00000] transition-colors duration-300 text-lg">Services</a>
+                <a href="#about" class="text-white hover:text-[#E00000] transition-colors duration-300 text-lg">About Us</a>
+                <a href="#ceo-portfolio" class="text-white hover:text-[#E00000] transition-colors duration-300 text-lg">Our Founder</a>
+                <a href="#gallery" class="text-white hover:text-[#E00000] transition-colors duration-300 text-lg">Gallery</a>
+                <a href="#testimonials" class="text-white hover:text-[#E00000] transition-colors duration-300 text-lg">Testimonials</a>
+                <a href="#contact" class="text-white hover:text-[#E00000] transition-colors duration-300 text-lg">Booking</a>
+            </div>
+            <button class="md:hidden text-white focus:outline-none">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="md:hidden bg-[#1A1A2E] py-4 hidden" id="mobile-menu">
+            <a href="#hero" class="block px-4 py-2 text-white hover:bg-[#2C2C40] transition-colors duration-300">Home</a>
+            <a href="#services" class="block px-4 py-2 text-white hover:bg-[#2C2C40] transition-colors duration-300">Services</a>
+            <a href="#about" class="block px-4 py-2 text-white hover:bg-[#2C2C40] transition-colors duration-300">About Us</a>
+            <a href="#ceo-portfolio" class="block px-4 py-2 text-white hover:bg-[#2C2C40] transition-colors duration-300">Our Founder</a>
+            <a href="#gallery" class="block px-4 py-2 text-white hover:bg-[#2C2C40] transition-colors duration-300">Gallery</a>
+            <a href="#testimonials" class="block px-4 py-2 text-white hover:bg-[#2C2C40] transition-colors duration-300">Testimonials</a>
+            <a href="#contact" class="block px-4 py-2 text-white hover:bg-[#2C2C40] transition-colors duration-300">Contact</a>
+        </div>
+    </nav>
+
+    <section id="hero" class="relative min-h-screen flex items-center justify-center text-center p-8 hero-background-dental">
+        <div class="absolute inset-0 bg-gradient-to-t from-[#1A1A2E] to-transparent opacity-80 z-10"></div>
+        <div class="relative z-20 max-w-4xl mx-auto">
+            <h1 class="text-5xl md:text-7xl font-extrabold leading-tight text-white mb-6 animate-fade-in-up">
+                Experience a Brighter, Healthier <span class="text-[#E00000]">Smile</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-300 mb-10 animate-fade-in-up delay-200">
+                At Gateway Dental Care, we combine compassionate service with advanced dentistry for your optimal oral health.
+            </p>
+            <a href="#contact" class="inline-block bg-[#E00000] text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#C00000] transition-transform transform hover:scale-105 duration-300 animate-fade-in-up delay-400">
+                Book Your Appointment
+            </a>
+        </div>
+    </section>
+
+    <section id="services" class="py-20 px-8 bg-[#1A1A2E] section-pattern-dental">
+        <div class="container mx-auto text-center">
+            <h2 class="text-4xl font-bold text-white mb-12">Our Comprehensive Dental Services</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div class="bg-[#2C2C40] p-8 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group" service-price="$150">
+                    <div class="text-[#E00000] mb-6 inline-block p-4 rounded-full bg-[#1A1A2E] group-hover:bg-[#E00000] group-hover:text-white transition-all duration-300">
+                        <i class="fas fa-tooth text-4xl"></i> </div>
+                    <h3 class="text-2xl font-semibold text-white mb-4">General Dentistry</h3>
+                    <p class="text-gray-300">Routine check-ups, cleanings, fillings, and preventive care for all ages.</p>
+                </div>
+                <div class="bg-[#2C2C40] p-8 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group" service-price="$600">
+                    <div class="text-[#E00000] mb-6 inline-block p-4 rounded-full bg-[#1A1A2E] group-hover:bg-[#E00000] group-hover:text-white transition-all duration-300">
+                        <i class="fas fa-magic text-4xl"></i> </div>
+                    <h3 class="text-2xl font-semibold text-white mb-4">Cosmetic Dentistry</h3>
+                    <p class="text-gray-300">Teeth whitening, veneers, bonding, and smile makeovers for a dazzling smile.</p>
+                </div>
+                <div class="bg-[#2C2C40] p-8 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group" service-price="$3000">
+                    <div class="text-[#E00000] mb-6 inline-block p-4 rounded-full bg-[#1A1A2E] group-hover:bg-[#E00000] group-hover:text-white transition-all duration-300">
+                        <i class="fas fa-align-left text-4xl"></i> </div>
+                    <h3 class="text-2xl font-semibold text-white mb-4">Orthodontics</h3>
+                    <p class="text-gray-300">Traditional braces and clear aligners to straighten your smile.</p>
+                </div>
+                <div class="bg-[#2C2C40] p-8 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group" service-price="$4000">
+                    <div class="text-[#E00000] mb-6 inline-block p-4 rounded-full bg-[#1A1A2E] group-hover:bg-[#E00000] group-hover:text-white transition-all duration-300">
+                        <i class="fas fa-fill-drip text-4xl"></i> </div>
+                    <h3 class="text-2xl font-semibold text-white mb-4">Dental Implants</h3>
+                    <p class="text-gray-300">Durable and natural-looking solutions for missing teeth.</p>
+                </div>
+                <div class="bg-[#2C2C40] p-8 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group" service-price="$250">
+                    <div class="text-[#E00000] mb-6 inline-block p-4 rounded-full bg-[#1A1A2E] group-hover:bg-[#E00000] group-hover:text-white transition-all duration-300">
+                        <i class="fas fa-ambulance text-4xl"></i> </div>
+                    <h3 class="text-2xl font-semibold text-white mb-4">Emergency Dentistry</h3>
+                    <p class="text-gray-300">Prompt care for dental emergencies when you need it most.</p>
+                </div>
+                <div class="bg-[#2C2C40] p-8 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group" service-price="$100">
+                    <div class="text-[#E00000] mb-6 inline-block p-4 rounded-full bg-[#1A1A2E] group-hover:bg-[#E00000] group-hover:text-white transition-all duration-300">
+                        <i class="fas fa-child text-4xl"></i> </div>
+                    <h3 class="text-2xl font-semibold text-white mb-4">Pediatric Dentistry</h3>
+                    <p class="text-gray-300">Gentle and friendly dental care specifically designed for children.</p>
+                </div>
+            </div>
+            <button id="viewServicePrices" class="mt-12 inline-block bg-[#E00000] text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#C00000] transition-transform transform hover:scale-105 duration-300">
+                View All Service Prices
+            </button>
+        </div>
+    </section>
+
+    <section id="about" class="py-20 px-8 bg-[#1A1A2E] border-t border-b border-[#2C2C40] section-pattern-dental">
+        <div class="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="relative">
+                <h2 class="text-4xl font-bold text-white mb-6">About Gateway Dental Care</h2>
+                <p class="text-gray-300 leading-relaxed mb-6 text-lg">
+                    At Gateway Dental Care, your oral health and comfort are our top priorities. Led by a team of highly skilled and compassionate dental professionals, we are committed to providing personalized care in a welcoming and state-of-the-art environment.
+                </p>
+                <p class="text-gray-300 leading-relaxed text-lg">
+                    We believe in empowering our patients with knowledge and offering a full spectrum of dental services, from routine check-ups to advanced cosmetic procedures, ensuring a healthy and radiant smile for life.
+                </p>
+                <div class="absolute -bottom-10 -left-10 w-48 h-48 opacity-20 hidden lg:block">
+                    <svg class="w-full h-full text-[#0F1E5E]" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 100 Q 50 50 100 100 T 180 100" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
+                        <path d="M20 120 Q 50 70 100 120 T 180 120" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="relative p-6 bg-[#2C2C40] rounded-lg shadow-2xl flex justify-center items-center">
+                <img src="https://via.placeholder.com/600x400/0F1E5E/FFFFFF?text=Our+Modern+Clinic" alt="Gateway Dental Clinic" class="rounded-lg object-cover w-full h-auto">
+                <div class="absolute inset-0 flex justify-center items-center opacity-10">
+                    <svg class="w-full h-full text-white" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="10" width="80" height="80" rx="5" ry="5" stroke="currentColor" stroke-width="1"/>
+                        <line x1="10" y1="50" x2="90" y2="50" stroke="currentColor" stroke-width="0.5"/>
+                        <line x1="50" y1="10" x2="50" y2="90" stroke="currentColor" stroke-width="0.5"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="ceo-portfolio" class="py-20 px-8 bg-[#1A1A2E] border-b border-[#2C2C40] section-pattern-dental">
+        <div class="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="relative bg-[#2C2C40] p-8 rounded-lg shadow-2xl text-center">
+                <img src="https://via.placeholder.com/200x200/E00000/FFFFFF?text=Dr.+Oluwafemi" alt="Dr. Oluwafemi Ogunsakin - CEO" class="w-48 h-48 rounded-full mx-auto mb-6 object-cover border-4 border-[#E00000]">
+                <h3 class="text-3xl font-bold text-white mb-2">Dr. Oluwafemi Ogunsakin, Bsc</h3>
+                <p class="text-[#E00000] text-xl font-semibold mb-6">Founder & Chief Dental Officer</p>
+                <div class="text-gray-300 text-left leading-relaxed space-y-4">
+                    <p>Dr. Oluwafemi Ogunsakin is the visionary leader behind Gateway Dental Care. With over 20 years of experience in restorative and cosmetic dentistry, Dr. Oluwafemi passion for oral health and patient-centric care led her to establish this clinic with a mission to deliver unparalleled dental services.</p>
+                    <p>A graduate of the prestigious University of Dental Medicine, Dr. Oluwafemi has continuously advanced her expertise through extensive post-graduate training in dental implants, orthodontics, and advanced smile design. Her commitment to integrating cutting-edge technology ensures every patient receives the most effective and comfortable treatment available.</p>
+                    <p class="italic text-lg">"My goal is to make every patient feel confident and comfortable, knowing they are receiving the highest standard of care for a healthy, beautiful smile."</p>
+                </div>
+                <div class="flex justify-center space-x-6 mt-8">
+                    <a href="#" class="text-gray-400 hover:text-[#E00000] transition-colors duration-300" aria-label="Dr. Oluwafemi's LinkedIn">
+                        <i class="fab fa-linkedin-in text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-[#E00000] transition-colors duration-300" aria-label="Dr. Oluwafemi's Twitter">
+                        <i class="fab fa-twitter text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="relative p-6">
+                <h2 class="text-4xl font-bold text-white mb-6">Our Philosophy on Patient Care</h2>
+                <p class="text-gray-300 leading-relaxed mb-6 text-lg">
+                    Dr. Oluwafemi's philosophy is rooted in a holistic approach to dental health, emphasizing prevention, education, and personalized treatment plans. She believes in building long-term relationships with patients based on trust and mutual respect.
+                </p>
+                <ul class="list-disc list-inside text-gray-300 text-lg space-y-3">
+                    <li>**Compassionate Care**: Ensuring comfort and understanding at every step.</li>
+                    <li>**Advanced Technology**: Utilizing the latest dental innovations for precision.</li>
+                    <li>**Patient Education**: Empowering you with knowledge for optimal oral health.</li>
+                    <li>**Ethical Practice**: Upholding the highest standards of integrity and transparency.</li>
+                </ul>
+                <div class="absolute -top-10 -right-10 w-64 h-64 opacity-15 hidden lg:block">
+                    <svg class="w-full h-full text-[#0F1E5E]" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 50 C 20 80, 80 120, 50 150 C 80 120, 140 80, 110 50 Z" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 2"/>
+                        <circle cx="100" cy="100" r="40" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="gallery" class="py-20 px-8 bg-[#1A1A2E] section-pattern-dental">
+        <div class="container mx-auto text-center">
+            <h2 class="text-4xl font-bold text-white mb-12">Our Smile Transformations Gallery</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div class="relative bg-[#2C2C40] rounded-lg shadow-xl overflow-hidden group">
+                    <img src="https://via.placeholder.com/700x500/0F1E5E/FFFFFF?text=Smile+Transformation+1" alt="Smile Transformation 1" class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300">
+                    <div class="p-6 text-left">
+                        <h3 class="text-2xl font-semibold text-white mb-2">Porcelain Veneers</h3>
+                        <p class="text-gray-400 mb-4">Achieving a perfect, natural-looking smile with custom veneers.</p>
+                        <a href="#" class="text-[#E00000] hover:underline text-lg flex items-center">
+                            View Details
+                            <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="relative bg-[#2C2C40] rounded-lg shadow-xl overflow-hidden group">
+                    <img src="https://via.placeholder.com/700x500/0F1E5E/FFFFFF?text=Smile+Transformation+2" alt="Smile Transformation 2" class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300">
+                    <div class="p-6 text-left">
+                        <h3 class="text-2xl font-semibold text-white mb-2">Invisalign Treatment</h3>
+                        <p class="text-gray-400 mb-4">Discreetly straightening teeth with clear aligners.</p>
+                        <a href="#" class="text-[#E00000] hover:underline text-lg flex items-center">
+                            View Details
+                            <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="relative bg-[#2C2C40] rounded-lg shadow-xl overflow-hidden group">
+                    <img src="https://via.placeholder.com/700x500/0F1E5E/FFFFFF?text=Smile+Transformation+3" alt="Smile Transformation 3" class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300">
+                    <div class="p-6 text-left">
+                        <h3 class="text-2xl font-semibold text-white mb-2">Professional Whitening</h3>
+                        <p class="text-gray-400 mb-4">Transforming smiles with professional in-office teeth whitening.</p>
+                        <a href="#" class="text-[#E00000] hover:underline text-lg flex items-center">
+                            View Details
+                            <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-16 border-t border-[#E00000] opacity-30 w-3/4 mx-auto relative">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#1A1A2E] px-4">
+                    <i class="fas fa-grin-beam text-2xl text-[#E00000]"></i> </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" class="py-20 px-8 bg-[#1A1A2E] section-pattern-dental">
+        <div class="container mx-auto text-center">
+            <h2 class="text-4xl font-bold text-white mb-12">What Our Patients Say</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="bg-[#2C2C40] p-8 rounded-lg shadow-xl border border-[#E00000] border-opacity-30">
+                    <p class="text-gray-300 italic text-lg mb-6">"The team at Gateway Dental Care is truly exceptional. From the moment I walked in, I felt comfortable and well-cared for. My new smile is amazing!"</p>
+                    <div class="flex items-center justify-center">
+                        <img src="https://via.placeholder.com/80x80/E00000/FFFFFF?text=SM" alt="Patient Avatar" class="w-16 h-16 rounded-full mr-4 border-2 border-[#E00000]">
+                        <div>
+                            <p class="font-semibold text-white text-xl">Sarah M.</p>
+                            <p class="text-gray-400">Happy Patient</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-[#2C2C40] p-8 rounded-lg shadow-xl border border-[#E00000] border-opacity-30">
+                    <p class="text-gray-300 italic text-lg mb-6">"I used to dread dental visits, but Gateway Dental Care changed that. Their gentle approach and clear explanations made me feel at ease. Highly recommend!"</p>
+                    <div class="flex items-center justify-center">
+                        <img src="https://via.placeholder.com/80x80/E00000/FFFFFF?text=JL" alt="Patient Avatar" class="w-16 h-16 rounded-full mr-4 border-2 border-[#E00000]">
+                        <div>
+                            <p class="font-semibold text-white text-xl">John L.</p>
+                            <p class="text-gray-400">Satisfied Patient</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="py-20 px-8 bg-[#1A1A2E] border-t border-[#2C2C40]">
+        <div class="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+                <h2 class="text-4xl font-bold text-white mb-6">Schedule a session with Gateway Dental Care today</h2>
+                <p class="text-gray-300 leading-relaxed mb-8">
+                    Schedule your next appointment or <a href="#contact" class="text-[#E00000] hover:underline">ask us a question</a>. We look forward to hearing from you!
+                </p>
+                <div class="space-y-6">
+                    <div class="flex items-center">
+                        <i class="fas fa-envelope text-[#E00000] text-3xl mr-4"></i>
+                        <p class="text-white text-lg">info@gatewaydental.com</p>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-phone-alt text-[#E00000] text-3xl mr-4"></i>
+                        <p class="text-white text-lg">+1 (555) 123-4567</p>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-map-marker-alt text-[#E00000] text-3xl mr-4"></i>
+                        <p class="text-white text-lg">123 Smile Avenue, Dental City, CA 90210</p>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-clock text-[#E00000] text-3xl mr-4"></i>
+                        <p class="text-white text-lg">Mon-Fri: 9:00 AM - 5:00 PM</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-[#2C2C40] p-8 rounded-lg shadow-2xl">
+                <form class="space-y-6">
+                    <div>
+                        <label for="name" class="block text-gray-300 text-sm font-bold mb-2">Name</label>
+                        <input type="text" id="name" name="name" class="shadow appearance-none border border-[#E00000] border-opacity-50 rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-[#E00000] bg-[#1A1A2E]" placeholder="Your Name">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-gray-300 text-sm font-bold mb-2">Email</label>
+                        <input type="email" id="email" name="email" class="shadow appearance-none border border-[#E00000] border-opacity-50 rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-[#E00000] bg-[#1A1A2E]" placeholder="your@email.com">
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-gray-300 text-sm font-bold mb-2">Phone (Optional)</label>
+                        <input type="tel" id="phone" name="phone" class="shadow appearance-none border border-[#E00000] border-opacity-50 rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-[#E00000] bg-[#1A1A2E]" placeholder="Your Phone Number">
+                    </div>
+                    <span class="fas fa-tooth text-4xl" id="pre-order">Pre-order</span>
+                    <div>
+                        <label for="symptoms" class="block text-gray-300 text-sm font-bold mb-2">Symptoms</label>
+                        <textarea id="symptoms" name="symptoms" rows="6" class="shadow appearance-none border border-[#E00000] border-opacity-50 rounded w-full py-3 px-4 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-[#E00000] bg-[#1A1A2E]" placeholder="Your message..."></textarea>
+                    </div>
+                    <span  class="w-full bg-[#E00000] text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-[#C00000] transition-colors duration-300 transform hover:scale-105" id="book-session">
+                        Book session
+                    </span>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-[#0D0D1A] py-8 px-8 text-center text-gray-400 border-t border-[#2C2C40]">
+        <div class="container mx-auto">
+            <div class="flex flex-wrap justify-center space-x-6 mb-4">
+                <a href="#hero" class="hover:text-[#E00000] transition-colors duration-300">Home</a>
+                <a href="#services" class="hover:text-[#E00000] transition-colors duration-300">Services</a>
+                <a href="#about" class="hover:text-[#E00000] transition-colors duration-300">About</a>
+                <a href="#ceo-portfolio" class="hover:text-[#E00000] transition-colors duration-300">Our Founder</a>
+                <a href="#gallery" class="hover:text-[#E00000] transition-colors duration-300">Gallery</a>
+                <a href="#contact" class="hover:text-[#E00000] transition-colors duration-300">Contact</a>
+            </div>
+            <p>&copy; 2025 Gateway Dental Care. All rights reserved.</p>
+            <div class="flex justify-center space-x-6 mt-4">
+                <a href="#" class="text-gray-400 hover:text-[#E00000] transition-colors duration-300">
+                    <i class="fab fa-facebook-f text-2xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-[#E00000] transition-colors duration-300">
+                    <i class="fab fa-instagram text-2xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-[#E00000] transition-colors duration-300">
+                    <i class="fab fa-twitter text-2xl"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="servicePriceOverlay" class="service-price-overlay">
+        <div class="service-price-content">
+            <div id="cart" class="bg-gray-800 p-6 rounded-lg mb-8">
+                <h3 class="text-2xl font-bold text-white mb-4">Your Selected Services</h3>
+                <div id="cartIconsContainer" class="flex flex-wrap gap-3 p-4 border border-gray-700 rounded-lg bg-[#0F1E5E] min-h-[60px] justify-center items-center">
+                    </div>
+                <p class="text-gray-400 text-sm mt-2 text-center">Click on services below to add them to your cart.</p>
+            </div>
+            <button id="closeServicePriceOverlay" class="close-button">&times;</button>
+            <h2 class="text-3xl font-bold text-white mb-8 text-center">Detailed Service Prices</h2>
+            <p class="text-gray-300 text-center mb-6">Here's a comprehensive list of our dental services and their estimated prices:</p>
+            <ul class="service-list space-y-4">
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-tooth text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> General Check-up</span>
+                    <span class="service-price font-bold text-white">150</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-stethoscope text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Dental Cleaning (Prophylaxis)</span>
+                    <span class="service-price font-bold text-white">100</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-fill-drip text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Composite Filling (per tooth)</span>
+                    <span class="service-price font-bold text-white">350</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-magic text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Professional Teeth Whitening</span>
+                    <span class="service-price font-bold text-white">600</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-crown text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Porcelain Crown</span>
+                    <span class="service-price font-bold text-white">1500</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-link text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Dental Bridge (per unit)</span>
+                    <span class="service-price font-bold text-white">1200</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-screwdriver text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Dental Implant (Single)</span>
+                    <span class="service-price font-bold text-white">5000</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-medkit text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Root Canal Treatment</span>
+                    <span class="service-price font-bold text-white">1200</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-cut text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Tooth Extraction (Simple)</span>
+                    <span class="service-price font-bold text-white">300</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-x-ray text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> X-Rays (Full Mouth Series)</span>
+                    <span class="service-price font-bold text-white">75</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-child text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Pediatric Exam & Cleaning</span>
+                    <span class="service-price font-bold text-white">90</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-align-left text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Clear Aligner Consultation</span>
+                    <span class="service-price font-bold text-white">50</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-plus-circle text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Oral Surgery Consultation</span>
+                    <span class="service-price font-bold text-white">80</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-head-side-mask text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Sedation Dentistry (Light)</span>
+                    <span class="service-price font-bold text-white">400</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-hand-holding-medical text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Gum Disease Treatment (Scaling & Root Planing)</span>
+                    <span class="service-price font-bold text-white">250 - 500 per quadrant</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-smile text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Cosmetic Bonding (per tooth)</span>
+                    <span class="service-price font-bold text-white">200 - 500</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-heartbeat text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Oral Cancer Screening</span>
+                    <span class="service-price font-bold text-white">50</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-allergies text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Night Guard / Splint</span>
+                    <span class="service-price font-bold text-white">600</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-user-md text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Emergency Visit (Exam Only)</span>
+                    <span class="service-price font-bold text-white">120</span>
+                </li>
+                <li class="bg-gray-700 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-600 transition-colors duration-200 group">
+                    <span class="service-name flex items-center"><i class="fas fa-briefcase-medical text-[#E00000] text-xl mr-3 group-hover:scale-110 transition-transform"></i> Dental Consultation (New Patient)</span>
+                    <span class="service-price font-bold text-white">75</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div id="bookingConfirmationOverlay" class="booking-confirmation-overlay">
+        <div class="booking-confirmation-content">
+            <button id="closeBookingConfirmationOverlay" class="close-button">&times;</button>
+            <h2 class="text-3xl font-bold text-white mb-8 text-center">Confirm Your Session Details</h2>
+    
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-white mb-4">Selected Services:</h3>
+                <div id="confirmedServiceIcons" class="flex flex-wrap gap-3 p-4 border border-gray-700 rounded-lg bg-[#0F1E5E] min-h-[60px] justify-center items-center">
+                    <p class="text-gray-400 text-sm italic">No services selected yet.</p>
+                </div>
+                <p class="text-gray-400 text-sm mt-2 text-center">Review your selected services before confirming.</p>
+            </div>
+    
+            <div class="mb-8 p-4 bg-[#2C2C40] rounded-lg shadow">
+                <h3 class="text-xl font-semibold text-white mb-4">Your Contact Information:</h3>
+                <p class="text-gray-300 mb-2"><strong class="text-[#E00000]">Name:</strong> <span id="confirmName"></span></p>
+                <p class="text-gray-300 mb-2"><strong class="text-[#E00000]">Email:</strong> <span id="confirmEmail"></span></p>
+                <p class="text-gray-300 mb-2"><strong class="text-[#E00000]">Phone:</strong> <span id="confirmPhone"></span></p>
+                <p class="text-gray-300"><strong class="text-[#E00000]">Symptoms/Message:</strong> <span id="confirmSymptoms"></span></p>
+                <p class="text-gray-300"><strong class="text-[#E00000]">Bill:</strong> <span id="confirmBill"></span></p>
+            </div>
+    
+            <button id="confirmBookingButton" class="w-full bg-[#E00000] text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-[#C00000] transition-colors duration-300 transform hover:scale-105">
+                Confirm & Book Session
+            </button>
+        </div>
+    </div>
+    <script src="{{url_for('static', filename='assets/js/gateway.js')}}"></script>
+</body>
+</html>
