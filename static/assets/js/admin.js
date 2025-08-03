@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 hours: clinicHours.value
             };
         
-            fetch("https://hhxsq4xb-8000.uks1.devtunnels.ms/update_clinic_info", {
+            fetch("https://dental-services-web-app-1.onrender.com/update_clinic_info", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
             // Handle Delete Service
             if (target.classList.contains('service-delete')) {
                 const payload = { id: serviceId };
-                fetch("https://hhxsq4xb-8000.uks1.devtunnels.ms/delete_service", {
+                fetch("https://dental-services-web-app-1.onrender.com/delete_service", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload),
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 icon_class: document.getElementById('edit_service_icon').value // Include icon class in update
             };
         
-            fetch("https://hhxsq4xb-8000.uks1.devtunnels.ms/update_service", {
+            fetch("https://dental-services-web-app-1.onrender.com/update_service", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 icon_class: iconName // Use the selected iconName
             };
         
-            fetch("https://hhxsq4xb-8000.uks1.devtunnels.ms/add_service", {
+            fetch("https://dental-services-web-app-1.onrender.com/add_service", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 id:event.target.closest('tr').getAttribute('appointment-id')
             };
         
-            fetch("https://hhxsq4xb-8000.uks1.devtunnels.ms/fetch_appointments", {
+            fetch("https://dental-services-web-app-1.onrender.com/fetch_appointments", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

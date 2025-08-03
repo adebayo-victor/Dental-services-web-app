@@ -224,7 +224,7 @@ def post_session():
             "email": email,
             "amount": bill,
             "metadata": metadata,
-            "callback_url": "https://hhxsq4xb-8000.uks1.devtunnels.ms/callback"  # 🔁 Paystack will redirect here
+            "callback_url": "https://dental-services-web-app-1.onrender.com/callback"  # 🔁 Paystack will redirect here
         }
 
         response = requests.post(PAYSTACK_INITIALIZE_URL, json=payload, headers=headers)
