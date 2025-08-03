@@ -19,7 +19,7 @@ load_dotenv()
 POSTMAIL_URL = os.environ.get("POSTMAIL_URl")
 ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
 #mail function
-def send_email(to_email, subject, message_body, reply_to="adebayovictorvicade@gmail.com"):
+def send_email(to_email, subject, message_body, reply_to="adebayooluseyi2@gmail.com"):
     payload = {
         "access_token": ACCESS_TOKEN,
         "subject": subject,
