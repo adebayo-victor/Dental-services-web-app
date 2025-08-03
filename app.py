@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 #loading stuff from dotenv
 load_dotenv()
 #get stuff from .env
-POSTMAIL_URL = os.environ.get('POSTMAIL_URL')
+POSTMAIL_URL = "https://postmail.invotes.com/send"
 ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
 #mail function
 def send_email(to_email, subject, message_body, reply_to="adebayooluseyi2@gmail.com"):
