@@ -4,10 +4,10 @@ from dotenv import load_dotenv
 load_dotenv()
 #get stuff from .env
 POSTMAIL_URL = "https://postmail.invotes.com/send"
-ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+ACCESS_TOKEN = "hdbymfysdug8wdyseenefm4r"
 #mail function
 import requests
-def send_email(to_email, subject, message_body, reply_to="adebayooluseyi2@gmail.com"):
+def send_email(to_email, subject, message_body, reply_to="adebayovictorvicade@gmail.com"):
     payload = {
         "access_token": ACCESS_TOKEN,
         "subject": subject,
@@ -25,7 +25,7 @@ def send_email(to_email, subject, message_body, reply_to="adebayooluseyi2@gmail.
         print("❌ Error:", str(e))
         return False
 send_email(
-    to_email="adebayovictorvicade@gmail.com",
+    to_email="adebayooluseyi2@gmail.com",
     subject="TECHLITE INNOVATIONS",
     message_body=f"Hello there, This is your  password => PLAy,🔐 try not to forget it"
 )
