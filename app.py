@@ -20,6 +20,7 @@ POSTMAIL_URL = "https://postmail.invotes.com/send"
 ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
 #mail function
 def send_email(to_email, subject, message_body, reply_to="adebayovictorvicade@gmail.com"):
+    print(ACCESS_TOKEN)
     payload = {
         "access_token": ACCESS_TOKEN,
         "subject": subject,
