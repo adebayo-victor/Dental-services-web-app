@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 hours: clinicHours.value
             };
         
-            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/update_clinic_info", {
+            fetch(" https://events-and-appointments-manager.onrender.com/update_clinic_info", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
             // Handle Delete Service
             if (target.classList.contains('service-delete')) {
                 const payload = { id: serviceId };
-                fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/delete_service", {
+                fetch(" https://events-and-appointments-manager.onrender.com/delete_service", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload),
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 icon_class: document.getElementById('edit_service_icon').value // Include icon class in update
             };
         
-            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/update_service", {
+            fetch(" https://events-and-appointments-manager.onrender.com/update_service", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 icon_class: iconName // Use the selected iconName
             };
         
-            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/add_service", {
+            fetch(" https://events-and-appointments-manager.onrender.com/add_service", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 id:event.target.closest('tr').getAttribute('appointment-id')
             };
         
-            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/fetch_appointments", {
+            fetch(" https://events-and-appointments-manager.onrender.com/fetch_appointments", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 email:document.querySelector('#appointment-email').value
             };
         
-            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/validate_appointment", {
+            fetch(" https://events-and-appointments-manager.onrender.com/validate_appointment", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -437,7 +437,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 seconds:expirySeconds.value
             };
         
-            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/set_expiry", {
+            fetch(" https://events-and-appointments-manager.onrender.com/set_expiry", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -477,7 +477,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
             // Handle Delete Member
             if (target.classList.contains('member-delete-btn') || target.id === 'member_delete') { // Check for class or ID
                 const payload = { id: memberId };
-                fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/delete_member", {
+                fetch(" https://events-and-appointments-manager.onrender.com/delete_member", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
@@ -521,7 +521,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 image_url:document.querySelector('#member_image').value,
             };
         
-            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/add_member", {
+            fetch(" https://events-and-appointments-manager.onrender.com/add_member", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -589,7 +589,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 input: searchInput.value
             };
         
-            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/search_appointment", {
+            fetch(" https://events-and-appointments-manager.onrender.com/search_appointment", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
