@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 email: confirmEmail.textContent,
                 services: serviceNames,
                 phone_number: confirmPhone.textContent,
-                symptoms: confirmSymptoms.textContent,
+                symptoms: confirmSymptoms.value,
                 bill: confirmBill.textContent
             }
             confirmName.textContent = formName.value

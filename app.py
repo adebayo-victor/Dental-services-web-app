@@ -224,7 +224,7 @@ def post_session():
             "email": email,
             "amount": bill,
             "metadata": metadata,
-            "callback_url": "https://dental-services-web-app-1.onrender.com/callback"  # 🔁 Paystack will redirect here
+            "callback_url": " https://hhxsq4xb-8000.uks1.devtunnels.ms/callback"  # 🔁 Paystack will redirect here
         }
 
         response = requests.post(PAYSTACK_INITIALIZE_URL, json=payload, headers=headers)
@@ -277,7 +277,7 @@ def callback():
         booked_time = datetime.now().strftime('%H:%M')
         note = f'''
             Services: {metadata['services']}
-            Symptoms: {metadata['symptoms']}
+            Message: {metadata['symptoms']}
             Bill: {int(metadata['bill']) / 100:.2f}
         '''
 
@@ -312,7 +312,7 @@ def update_clinic_info():
             print(e)
             return {"response":f"Uh oh, somethig happened in the backend  => {e}"}
 icon_classes = [
-    # Core Medical / Dental / Clinic
+    # Core Medical /   / Clinic
     "fas fa-tooth",
     "fas fa-brush",
     "fas fa-medkit",

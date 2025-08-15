@@ -168,8 +168,8 @@ def insert_sample_data():
         db.execute("""
             INSERT INTO clinic_info (clinic_name, address, phone_number, email, operating_hours, tagline)
             VALUES (?, ?, ?, ?, ?, ?)
-        """, "Zaclice Dental Care", "123 Dental Lane, Lagos", "08012345678",
-            "contact@zacdental.com", "Mon–Fri: 9AM–5PM", "Brightening Smiles Everyday")
+        """, "Zaclice   Care", "123   Lane, Lagos", "08012345678",
+            "contact@zac .com", "Mon–Fri: 9AM–5PM", "Brightening Smiles Everyday")
 
     if not db.execute("SELECT COUNT(*) FROM services")[0]["COUNT(*)"]:
         db.execute("""
@@ -196,7 +196,7 @@ def insert_sample_data():
         db.execute("""
             INSERT INTO team_members (name, position, specialization, email, phone_number, bio, image_url,password)
             VALUES (?, ?, ?, ?, ?, ?, ?,?)
-        """, "Dr. Ada Obi", "Chief Dentist", "Cosmetic Dentistry", "ada@zacdental.com",
+        """, "Dr. Ada Obi", "Chief  ", "Cosmetic  ry", "ada@zac .com",
             "08022223333", "Focused on transforming smiles.", "https://i.imgur.com/doctorada.jpg", 'password123')
 
     if not db.execute("SELECT COUNT(*) FROM blog_posts")[0]["COUNT(*)"]:
@@ -215,7 +215,7 @@ def insert_sample_data():
         db.execute("""
             INSERT INTO users (username, email, password_hash)
             VALUES (?, ?, ?)
-        """, "admin", "admin@zacdental.com", "placeholder_admin_password_hash")
+        """, "admin", "admin@zac .com", "placeholder_admin_password_hash")
 
     print("✅ All tables created & sample data loaded. The database is armed, dangerous, and fabulous.")
 

@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 hours: clinicHours.value
             };
         
-            fetch("https://dental-services-web-app-1.onrender.com/update_clinic_info", {
+            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/update_clinic_info", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
             // Handle Delete Service
             if (target.classList.contains('service-delete')) {
                 const payload = { id: serviceId };
-                fetch("https://dental-services-web-app-1.onrender.com/delete_service", {
+                fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/delete_service", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload),
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 icon_class: document.getElementById('edit_service_icon').value // Include icon class in update
             };
         
-            fetch("https://dental-services-web-app-1.onrender.com/update_service", {
+            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/update_service", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 icon_class: iconName // Use the selected iconName
             };
         
-            fetch("https://dental-services-web-app-1.onrender.com/add_service", {
+            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/add_service", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 id:event.target.closest('tr').getAttribute('appointment-id')
             };
         
-            fetch("https://dental-services-web-app-1.onrender.com/fetch_appointments", {
+            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/fetch_appointments", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -397,7 +397,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 email:document.querySelector('#appointment-email').value
             };
         
-            fetch("https://dental-services-web-app-1.onrender.com/validate_appointment", {
+            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/validate_appointment", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 seconds:expirySeconds.value
             };
         
-            fetch("https://dental-services-web-app-1.onrender.com/set_expiry", {
+            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/set_expiry", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -476,7 +476,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
             // Handle Delete Member
             if (target.classList.contains('member-delete-btn') || target.id === 'member_delete') { // Check for class or ID
                 const payload = { id: memberId };
-                fetch("https://dental-services-web-app-1.onrender.com/delete_member", {
+                fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/delete_member", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
@@ -520,7 +520,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 image_url:document.querySelector('#member_image').value,
             };
         
-            fetch("https://dental-services-web-app-1.onrender.com/add_member", {
+            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/add_member", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -588,7 +588,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 input: searchInput.value
             };
         
-            fetch("https://dental-services-web-app-1.onrender.com/search_appointment", {
+            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/search_appointment", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -643,7 +643,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
             payload = {
                 id: event.target.getAttribute('blog_id')
             }
-            fetch("https://dental-services-web-app-1.onrender.com/delete_blog", {
+            fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/delete_blog", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -671,7 +671,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     })
     //here is where the chart magic happens
     //obtaining the data
-    fetch("https://dental-services-web-app-1.onrender.com/appointment_trend", {
+    fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/appointment_trend", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -718,7 +718,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
         console.error("Fetch error:", error);
     });
     //service popularity
-    fetch("https://dental-services-web-app-1.onrender.com/service_popularity")
+    fetch(" https://hhxsq4xb-8000.uks1.devtunnels.ms/service_popularity")
     .then(response => {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         return response.json();
